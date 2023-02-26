@@ -1,0 +1,57 @@
+datasource db {
+    provider = "mysql"
+    url      = env("DATABASE_URL")
+}
+
+// model Post {
+//     id        Int      @id @default(autoincrement())
+//     createdAt DateTime @default(now())
+//     updatedAt DateTime @updatedAt
+//     title     String   @db.VarChar(255)
+//     content   String?
+//     published Boolean  @default(false)
+//     author    User     @relation(fields: [authorId], references: [id])
+//     authorId  Int
+// }
+
+model customer {
+    customer_id      Int               @id @default(autoincrement())
+    uuid             String            @default(uuid())
+    status           Int
+    customer_group   customer_group?   @relation(fields: [group_id], references: [customer_group_id])
+    group_id         Int?
+    email            String            @unique
+    password         String
+    full_name        String
+    created_at       DateTime          @default(now())
+    updated_at       DateTime          @default(now())
+    customer_address customer_address?
+}
+
+model customer_address {
+    customer_address_id Int      @id @default(autoincrement())
+    uuid                String   @default(uuid())
+    customer            customer @relation(fields: [customer_id], references: [customer_id])
+    customer_id         Int      @unique
+    full_name           String?
+    telephone           String?
+    address_1           String?
+    address_2           String?
+    postcode            String?
+    city                String?
+    province            String?
+    country             String
+    created_at          DateTime @default(now())
+    updated_at          DateTime @default(now())
+    is_default          Int?
+}
+
+model customer_group {
+    customer_group_id Int        @id @default(autoincrement())
+    uuid              String     @default(uuid())
+    group_name        String
+    created_at        DateTime   @default(now())
+    updated_at        DateTime   @default(now())
+    row_id            Int
+    customer          customer[]
+}
