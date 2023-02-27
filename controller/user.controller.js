@@ -4,7 +4,7 @@ const { PrismaClient } = require("@prisma/client");
 const { v4: uuidv4 } = require("uuid");
 const prisma = new PrismaClient();
 const { generateToken } = require("../services/generateToken");
-  
+
 const createCustomer = async (req, res) => {
   const { body } = req;
   const { email, full_name, password } = body;
@@ -52,10 +52,33 @@ const createCustomerSession = async (req, res) => {
       });
     } else {
       const sid = uuidv4();
-      const guestPayload = { customer: null, sid };
-      const newToken = generateToken(guestPayload, process.env.KEY, "2d");
+      const JWT_SECRET = uuidv4();
+      // update customer new secret
+      // update customer new sid
+      const customer = await prisma.customer.update({
+        where: {
+          email: email,
+        },
+        data: {
+          user_id: customer.uuid,
+          sid: sid,
+          secret: JWT_SECRET,
+        },
+      });
+      // delete customer password
+      delete customer.password;
+      // create newPayload
+      if (!customer.password) {
+        const newPayload = { customer: customer, sid };
+        // creare new token
+        // const token = sign(newPayload, JWT_SECRET);
+        const token = generateToken(newPayload, JWT_SECRET, "2d");
+        res.status(200).json({
+          token: token,
+        });
+      }
     }
   }
 };
 
-module.exports = createCustomer;
+module.exports = { createCustomer, createCustomerSession };
