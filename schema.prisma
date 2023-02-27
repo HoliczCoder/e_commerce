@@ -3,6 +3,10 @@ datasource db {
     url      = env("DATABASE_URL")
 }
 
+generator client {
+    provider = "prisma-client-js"
+}
+
 // model Post {
 //     id        Int      @id @default(autoincrement())
 //     createdAt DateTime @default(now())
@@ -54,4 +58,13 @@ model customer_group {
     updated_at        DateTime   @default(now())
     row_id            Int
     customer          customer[]
+}
+
+model user_token_secret {
+    user_token_secret_id Int      @id @default(autoincrement())
+    user_id              String   @unique
+    sid                  String
+    secret               String
+    created_at           DateTime @default(now())
+    updated_at           DateTime @default(now())
 }
