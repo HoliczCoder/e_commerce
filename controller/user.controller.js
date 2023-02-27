@@ -19,9 +19,11 @@ const createCustomer = async (req, res) => {
         status: 1,
       },
     });
-    res.json(prisma);
-  } catch (error) {
     res.json({
+      result: "okie",
+    });
+  } catch (error) {
+    res.status(500).json({
       error: error,
     });
   }
