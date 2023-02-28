@@ -55,24 +55,38 @@ const createCustomerSession = async (req, res) => {
     } else {
       const sid = uuidv4();
       const JWT_SECRET = uuidv4();
-      // update customer new secret
-      // update customer new sid
-      const customer = await prisma.customer.update({
+      // find user_token_secret
+      const userTokenSecret = await prisma.userTokenSecret.findFirst({
         where: {
-          email: email,
-        },
-        data: {
           user_id: customer.uuid,
-          sid: sid,
-          secret: JWT_SECRET,
         },
       });
+      // if userTokenSecret exist?
+      if (userTokenSecret) {
+        await prisma.userTokenSecret.update({
+          where: {
+            user_id: customer.uuid,
+          },
+          data: {
+            sid: sid,
+            secret: JWT_SECRET,
+          },
+        });
+      } else {
+        await prisma.userTokenSecret.create({
+          data: {
+            user_id: customer.uuid,
+            sid: sid,
+            secret: JWT_SECRET,
+          },
+        });
+      }
       // delete customer password
       delete customer.password;
       // create newPayload
       if (!customer.password) {
         const newPayload = { customer: customer, sid };
-        // creare new token
+        // create new token
         // const token = sign(newPayload, JWT_SECRET);
         const token = generateToken(newPayload, JWT_SECRET, "2d");
         res.status(200).json({
