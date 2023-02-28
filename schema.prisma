@@ -7,24 +7,26 @@ generator client {
     provider = "prisma-client-js"
 }
 
-model customer {
-    customer_id      Int               @id @default(autoincrement())
-    uuid             String            @default(uuid())
-    status           Int
-    customer_group   customer_group?   @relation(fields: [group_id], references: [customer_group_id])
+model Customer {
+    customer_id      Int              @id @default(autoincrement())
+    uuid             String           @unique @default(dbgenerated("(replace(uuid(),'-',''))"))
+    status           Int              @default(1)
+    customer_group   CustomerGroup?   @relation(fields: [group_id], references: [customer_group_id])
     group_id         Int?
-    email            String            @unique
+    email            String           @unique
     password         String
-    full_name        String
-    created_at       DateTime          @default(now())
-    updated_at       DateTime          @default(now())
-    customer_address customer_address?
+    full_name        String?
+    created_at       DateTime         @default(now())
+    updated_at       DateTime         @updatedAt @default(now())
+    customer_address CustomerAddress?
+
+    @@map("customer")
 }
 
-model customer_address {
+model CustomerAddress {
     customer_address_id Int      @id @default(autoincrement())
-    uuid                String   @default(uuid())
-    customer            customer @relation(fields: [customer_id], references: [customer_id])
+    uuid                String   @unique @default(dbgenerated("(replace(uuid(),'-',''))"))
+    customer            Customer @relation(fields: [customer_id], references: [customer_id])
     customer_id         Int      @unique
     full_name           String?
     telephone           String?
@@ -35,25 +37,34 @@ model customer_address {
     province            String?
     country             String
     created_at          DateTime @default(now())
-    updated_at          DateTime @default(now())
+    updated_at          DateTime @updatedAt @default(now())
     is_default          Int?
+
+    @@map("customer_address")
+    @@index([customer_id], name: "FK_CUSTOMER_ADDRESS_LINK")
 }
 
-model customer_group {
-    customer_group_id Int        @id @default(autoincrement())
-    uuid              String     @default(uuid())
-    group_name        String
+model CustomerGroup {
+    customer_group_id Int        @id @unique
+    uuid              String     @unique @default(dbgenerated("(replace(uuid(),'-',''))"))
+    group_name        String     
     created_at        DateTime   @default(now())
-    updated_at        DateTime   @default(now())
-    row_id            Int
-    customer          customer[]
+    updated_at        DateTime   @updatedAt @default(now())
+    row_id            Int        @unique @default(autoincrement()) 
+    customer          Customer[]
+
+    @@index([row_id])
+    @@map("customer_group")
 }
 
-model user_token_secret {
+model UserTokenSecret {
     user_token_secret_id Int      @id @default(autoincrement())
-    user_id              String   @unique
+    user_id              String
     sid                  String
     secret               String
     created_at           DateTime @default(now())
-    updated_at           DateTime @default(now())
+    updated_at           DateTime @updatedAt @default(now())
+
+    @@unique([user_id], name: "USER_TOKEN_USER_ID")
+    @@map("user_token_secret")
 }
