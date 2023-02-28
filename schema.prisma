@@ -17,7 +17,7 @@ model Customer {
     password         String
     full_name        String?
     created_at       DateTime         @default(now())
-    updated_at       DateTime         @updatedAt @default(now())
+    updated_at       DateTime         @default(now()) @updatedAt
     customer_address CustomerAddress?
 
     @@map("customer")
@@ -37,20 +37,20 @@ model CustomerAddress {
     province            String?
     country             String
     created_at          DateTime @default(now())
-    updated_at          DateTime @updatedAt @default(now())
+    updated_at          DateTime @default(now()) @updatedAt
     is_default          Int?
 
-    @@map("customer_address")
     @@index([customer_id], name: "FK_CUSTOMER_ADDRESS_LINK")
+    @@map("customer_address")
 }
 
 model CustomerGroup {
     customer_group_id Int        @id @unique
     uuid              String     @unique @default(dbgenerated("(replace(uuid(),'-',''))"))
-    group_name        String     
+    group_name        String
     created_at        DateTime   @default(now())
-    updated_at        DateTime   @updatedAt @default(now())
-    row_id            Int        @unique @default(autoincrement()) 
+    updated_at        DateTime   @default(now()) @updatedAt
+    row_id            Int        @unique @default(autoincrement())
     customer          Customer[]
 
     @@index([row_id])
@@ -63,8 +63,56 @@ model UserTokenSecret {
     sid                  String
     secret               String
     created_at           DateTime @default(now())
-    updated_at           DateTime @updatedAt @default(now())
+    updated_at           DateTime @default(now()) @updatedAt
 
     @@unique([user_id], name: "USER_TOKEN_USER_ID")
     @@map("user_token_secret")
+}
+
+model Product {
+    product_id         Int             @id @default(autoincrement())
+    uuid               String          @unique @default(dbgenerated("(replace(uuid(),'-',''))"))
+    variant_group      VariantGroup?   @relation(fields: [variant_group_id], references: [variant_group_id])
+    variant_group_id   Int?
+    visibility         Int?
+    attribute_group    AtrributeGroup? @relation(fields: [group_id], references: [attribute_group_id])
+    group_id           Int?
+    image              Int?
+    sku                String          @unique
+    price              Float
+    qty                Int
+    weight             Float?
+    manage_stock       Boolean
+    stock_availability Boolean
+    tax_class          Int?
+    status             Boolean
+    created_at         DateTime        @default(now())
+    updated_at         DateTime        @default(now()) @updatedAt
+
+    @@map("product")
+}
+
+model VariantGroup {
+    variant_group_id   Int       @id @default(autoincrement())
+    uuid               String    @unique @default(dbgenerated("(replace(uuid(),'-',''))"))
+    attribute_group_id Int
+    attribute_one      Int?
+    attribute_two      Int?
+    attribute_three    Int?
+    attribute_four     Int?
+    attribute_five     Int?
+    visibility         Int       @default(0)
+    Product            Product[]
+
+    @@map("variant_group")
+}
+
+model AtrributeGroup {
+    attribute_group_id Int       @id @default(autoincrement())
+    group_name         String
+    created_at         DateTime  @default(now())
+    updated_at         DateTime  @default(now()) @updatedAt
+    Product            Product[]
+
+    @@map("attribute_group")
 }

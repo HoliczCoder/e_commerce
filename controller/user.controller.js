@@ -45,7 +45,7 @@ const createCustomerSession = async (req, res) => {
     });
   } else {
     const { password: hash } = customer;
-    const result = await compare(password, hash);
+    const result = await compare(password.toString(), hash.toString());
     if (!result) {
       res.status(400).json({
         error: {

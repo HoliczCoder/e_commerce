@@ -5,7 +5,7 @@ const { PrismaClient } = require("@prisma/client");
 const prisma = new PrismaClient();
 
 module.exports = customerTokenVerify = async (req, res, next) => {
-  const token = req.headers.authorization.split(" ")[1];
+  const token = req?.headers?.authorization?.split(" ")[1];
   // Get the jwt token from the req
   const sid = uuidv4();
   const guestPayload = { customer: null, sid };
