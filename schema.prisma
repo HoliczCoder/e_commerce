@@ -91,8 +91,22 @@ model Product {
     created_at                 DateTime                     @default(now())
     updated_at                 DateTime                     @default(now()) @updatedAt
     ProductAttributeValueIndex ProductAttributeValueIndex[]
+    ProductDescription         ProductDescription?
 
     @@map("product")
+}
+
+model ProductDescription {
+    product_description_id         Int     @id @default(autoincrement())
+    product                        Product @relation(fields: [product_description_product_id], references: [product_id])
+    product_description_product_id Int     @unique
+    name                           String
+    description                    String?
+    short_description              String?
+    url_key                        String
+    meta_title                     String?
+    meta_description               String?
+    meta_keywords                  String?
 }
 
 model VariantGroup {
