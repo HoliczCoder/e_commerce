@@ -70,49 +70,120 @@ model UserTokenSecret {
 }
 
 model Product {
-    product_id         Int             @id @default(autoincrement())
-    uuid               String          @unique @default(dbgenerated("(replace(uuid(),'-',''))"))
-    variant_group      VariantGroup?   @relation(fields: [variant_group_id], references: [variant_group_id])
-    variant_group_id   Int?
-    visibility         Int?
-    attribute_group    AtrributeGroup? @relation(fields: [group_id], references: [attribute_group_id])
-    group_id           Int?
-    image              Int?
-    sku                String          @unique
-    price              Float
-    qty                Int
-    weight             Float?
-    manage_stock       Boolean
-    stock_availability Boolean
-    tax_class          Int?
-    status             Boolean
-    created_at         DateTime        @default(now())
-    updated_at         DateTime        @default(now()) @updatedAt
+    product_id                 Int                          @id @default(autoincrement())
+    uuid                       String                       @unique @default(dbgenerated("(replace(uuid(),'-',''))"))
+    // a VariantGroup is a must for product, VariantGroup contain many child prodcucts   
+    variant_group              VariantGroup?                @relation(fields: [variant_group_id], references: [variant_group_id])
+    variant_group_id           Int?
+    visibility                 Int                          @default(1)
+    //  why do we need attribute_group here, we can retrieve AtrributeGroup through VariantGroup?
+    attribute_group            AtrributeGroup?              @relation(fields: [group_id], references: [attribute_group_id])
+    group_id                   Int?
+    image                      Int?
+    sku                        String                       @unique
+    price                      Float
+    qty                        Int
+    weight                     Float?
+    manage_stock               Boolean
+    stock_availability         Boolean
+    tax_class                  Int?
+    status                     Boolean
+    created_at                 DateTime                     @default(now())
+    updated_at                 DateTime                     @default(now()) @updatedAt
+    ProductAttributeValueIndex ProductAttributeValueIndex[]
 
     @@map("product")
 }
 
 model VariantGroup {
-    variant_group_id   Int       @id @default(autoincrement())
-    uuid               String    @unique @default(dbgenerated("(replace(uuid(),'-',''))"))
+    variant_group_id   Int            @id @default(autoincrement())
+    uuid               String         @unique @default(dbgenerated("(replace(uuid(),'-',''))"))
+    // a VariantGroup hav a AtrributeGroup of a product inside this variant
+    attribute_group    AtrributeGroup @relation(fields: [attribute_group_id], references: [attribute_group_id])
     attribute_group_id Int
+    // dont understand what Atrribute here to do what?
+    attribute          Atrribute?     @relation(fields: [attribute_one], references: [attribute_id])
     attribute_one      Int?
     attribute_two      Int?
     attribute_three    Int?
     attribute_four     Int?
     attribute_five     Int?
-    visibility         Int       @default(0)
+    visibility         Int            @default(0)
     Product            Product[]
 
     @@map("variant_group")
 }
 
 model AtrributeGroup {
-    attribute_group_id Int       @id @default(autoincrement())
+    attribute_group_id Int                  @id @default(autoincrement())
+    uuid               String               @unique @default(dbgenerated("(replace(uuid(),'-',''))"))
     group_name         String
-    created_at         DateTime  @default(now())
-    updated_at         DateTime  @default(now()) @updatedAt
+    created_at         DateTime             @default(now())
+    updated_at         DateTime             @default(now()) @updatedAt
     Product            Product[]
+    // one to many, a AtrributeGroup inside many VariantGroup
+    VariantGroup       VariantGroup[]
+    AttributeGroupLink AttributeGroupLink[]
 
     @@map("attribute_group")
+}
+
+model Atrribute {
+    attribute_id               Int                          @id @default(autoincrement())
+    uuid                       String                       @unique @default(dbgenerated("(replace(uuid(),'-',''))"))
+    attribute_code             String                       @unique
+    attribute_name             String
+    type                       String
+    is_required                Int                          @default(0)
+    display_on_frontend        Int                          @default(0)
+    sort_order                 Int                          @default(0)
+    is_filterable              Int                          @default(0)
+    // one to many in VariantGroup, dont understand why?
+    VariantGroup               VariantGroup[]
+    // many to many with attribute and attribute_group
+    AttributeGroupLink         AttributeGroupLink[]
+    ProductAttributeValueIndex ProductAttributeValueIndex[]
+    AttributeOption            AttributeOption[]
+
+    @@map("attribute")
+}
+
+model AttributeGroupLink {
+    // many to many with attribute and attribute_group
+    attribute_group_link_id Int            @id @default(autoincrement())
+    attribute               Atrribute      @relation(fields: [attribute_id], references: [attribute_id])
+    attribute_id            Int
+    attribute_group         AtrributeGroup @relation(fields: [group_id], references: [attribute_group_id])
+    group_id                Int
+
+    @@map("attribute_group_link")
+}
+
+model AttributeOption {
+    attribute_option_id        Int                          @id @default(autoincrement())
+    uuid                       String                       @unique @default(dbgenerated("(replace(uuid(),'-',''))"))
+    // many to one, one attribute can have to many options 
+    attribute                  Atrribute                    @relation(fields: [attribute_id], references: [attribute_id])
+    attribute_id               Int
+    attribute_code             String
+    option_text                String
+    ProductAttributeValueIndex ProductAttributeValueIndex[]
+
+    @@index([attribute_id])
+    @@map("attribute_option")
+}
+
+model ProductAttributeValueIndex {
+    product_attribute_value_index_id Int              @id @default(autoincrement())
+    // many to many between product and attribute
+    product                          Product          @relation(fields: [product_id], references: [product_id])
+    product_id                       Int
+    attribute                        Atrribute        @relation(fields: [attribute_id], references: [attribute_id])
+    attribute_id                     Int
+    attribute_option                 AttributeOption? @relation(fields: [option_id], references: [attribute_option_id])
+    option_id                        Int?
+    option_text                      String?
+
+    @@unique([product_id, attribute_id, option_id])
+    @@map("product_attribute_value_index")
 }
