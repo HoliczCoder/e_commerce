@@ -125,7 +125,7 @@ const updateAttribute = async (req, res) => {
     // delete exist attribute_group_link if remove group
     const attribute_group_link = await prisma.attributeGroupLink.findMany({
       where: {
-        attribute_id: attributeId,
+        attribute_id: attributeData.attribute_id,
       },
     });
     //
