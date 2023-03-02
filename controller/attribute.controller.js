@@ -45,14 +45,14 @@ const createAttribute = async (req, res) => {
     // find if hava a attribute group
     if (attributeData.groups === undefined) {
       res.status(200).json({
-        res: "okie",
+        res: atrribute,
       });
     }
-
+    //
     const promises = [];
 
     for (let index = 0; index < attributeData.groups.length; index += 1) {
-      const group = await prisma.atrributeGroup.findFirst({
+      const group = await prisma.atrributeGroup.findUnique({
         where: {
           attribute_group_id: attributeData.groups[index],
         },
@@ -89,8 +89,23 @@ const updateAttribute = async (req, res) => {
       });
     }
     const attributeData = req.body;
+    // find if atrribute exist or not
+    const isAtrributeExist = await prisma.atrribute.findUnique({
+      where: {
+        attribute_id: attributeData.attribute_id,
+      },
+    });
+    if (!isAtrributeExist) {
+      res.status(400).json({
+        res: "this attribute not exist",
+      });
+      return;
+    }
     //
     const atrribute = await prisma.atrribute.update({
+      where: {
+        attribute_id: attributeData.attribute_id,
+      },
       data: {
         attribute_code: attributeData.attribute_code,
         attribute_name: attributeData.attribute_name,
@@ -101,13 +116,51 @@ const updateAttribute = async (req, res) => {
         is_filterable: attributeData.is_filterable,
       },
     });
+    // find if hava a attribute group
+    if (attributeData.groups === undefined) {
+      res.status(200).json({
+        res: atrribute,
+      });
+    }
     // delete exist attribute_group_link if remove group
     const attribute_group_link = await prisma.attributeGroupLink.findMany({
       where: {
         attribute_id: attributeId,
       },
     });
+    //
+    if (!attribute_group_link) {
+      // have to create new
+      const promises = [];
 
+      for (let index = 0; index < attributeData.groups.length; index += 1) {
+        const group = await prisma.atrributeGroup.findUnique({
+          where: {
+            attribute_group_id: attributeData.groups[index],
+          },
+        });
+        if (group) {
+          promises.push(
+            prisma.attributeGroupLink.create({
+              data: {
+                attribute_id: atrribute.attribute_id,
+                group_id: attributeData.groups[index],
+              },
+            })
+          );
+        }
+      }
+      //
+      const result = await Promise.allSettled(promises);
+      res.status(200).json({
+        result: result,
+      });
+      //
+    }
+    //
+    //
+    //
+    // if attribute_group_link exist
     const promises = [];
 
     attribute_group_link.map(async (item) => {
