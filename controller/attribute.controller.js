@@ -74,6 +74,35 @@ const createAttribute = async (req, res) => {
   }
 };
 
+const deleteAttribute = async (req, res) => {
+  const atrributeUUID = req.body.uuid;
+  try {
+    const ifExistAttribute = await prisma.atrribute.findUnique({
+      where: {
+        uuid: atrributeUUID,
+      },
+    });
+    if (!ifExistAttribute) {
+      res.status(400).json({
+        error: "attribute not exist",
+      });
+      return;
+    }
+    const deleteAttribute = await prisma.atrribute.delete({
+      where: {
+        uuid: atrributeUUID,
+      },
+    });
+    res.status(200).json({
+      res: deleteAttribute,
+    });
+  } catch (error) {
+    res.status(500).json({
+      error: error,
+    });
+  }
+};
+
 const updateAttribute = async (req, res) => {
   try {
     if (!type.includes(req.body.type)) {
@@ -237,4 +266,5 @@ module.exports = {
   createAttributeGroup,
   createAttribute,
   updateAttribute,
+  deleteAttribute,
 };

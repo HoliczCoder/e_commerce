@@ -165,7 +165,7 @@ model Atrribute {
 model AttributeGroupLink {
     // many to many with attribute and attribute_group
     attribute_group_link_id Int            @id @default(autoincrement())
-    attribute               Atrribute      @relation(fields: [attribute_id], references: [attribute_id])
+    attribute               Atrribute      @relation(fields: [attribute_id], references: [attribute_id], onDelete: Cascade, onUpdate: Cascade)
     attribute_id            Int
     attribute_group         AtrributeGroup @relation(fields: [group_id], references: [attribute_group_id])
     group_id                Int
@@ -177,7 +177,7 @@ model AttributeOption {
     attribute_option_id        Int                          @id @default(autoincrement())
     uuid                       String                       @unique @default(dbgenerated("(replace(uuid(),'-',''))"))
     // many to one, one attribute can have to many options 
-    attribute                  Atrribute                    @relation(fields: [attribute_id], references: [attribute_id])
+    attribute                  Atrribute                    @relation(fields: [attribute_id], references: [attribute_id], onDelete: Cascade, onUpdate: Cascade)
     attribute_id               Int
     attribute_code             String
     option_text                String
@@ -192,7 +192,7 @@ model ProductAttributeValueIndex {
     // many to many between product and attribute
     product                          Product          @relation(fields: [product_id], references: [product_id])
     product_id                       Int
-    attribute                        Atrribute        @relation(fields: [attribute_id], references: [attribute_id])
+    attribute                        Atrribute        @relation(fields: [attribute_id], references: [attribute_id], onDelete: Cascade, onUpdate: Cascade)
     attribute_id                     Int
     attribute_option                 AttributeOption? @relation(fields: [option_id], references: [attribute_option_id])
     option_id                        Int?
