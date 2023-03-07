@@ -167,7 +167,7 @@ model AttributeGroupLink {
     attribute_group_link_id Int            @id @default(autoincrement())
     attribute               Atrribute      @relation(fields: [attribute_id], references: [attribute_id], onDelete: Cascade, onUpdate: Cascade)
     attribute_id            Int
-    attribute_group         AtrributeGroup @relation(fields: [group_id], references: [attribute_group_id])
+    attribute_group         AtrributeGroup @relation(fields: [group_id], references: [attribute_group_id], onDelete: Cascade, onUpdate: Cascade)
     group_id                Int
 
     @@map("attribute_group_link")

@@ -5,12 +5,15 @@ const {
   createAttribute,
   updateAttribute,
   deleteAttribute,
+  deleteAttributeGroup,
 } = require("../controller/attribute.controller");
 const customerTokenVerify = require("../middleware/customerTokenVerify");
 
 router.post("/", createAttribute);
-router.post("/attribute-group", createAttributeGroup);
 router.put("/", updateAttribute);
 router.delete("/", deleteAttribute);
+
+router.post("/attribute-group", createAttributeGroup);
+router.delete("/attribute-group", deleteAttributeGroup);
 
 module.exports = router;

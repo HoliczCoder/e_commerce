@@ -103,6 +103,24 @@ const deleteAttribute = async (req, res) => {
   }
 };
 
+const deleteAttributeGroup = async (req, res) => {
+  const attributeGroupUUID = req.body.uuid;
+  try {
+    const deleteAttributeGroupUUID = await prisma.atrributeGroup.delete({
+      where: {
+        uuid: attributeGroupUUID,
+      },
+    });
+    res.status(200).json({
+      res: deleteAttributeGroupUUID,
+    });
+  } catch (error) {
+    res.status(500).json({
+      error: error,
+    });
+  }
+};
+
 const updateAttribute = async (req, res) => {
   try {
     if (!type.includes(req.body.type)) {
@@ -267,4 +285,5 @@ module.exports = {
   createAttribute,
   updateAttribute,
   deleteAttribute,
+  deleteAttributeGroup,
 };
