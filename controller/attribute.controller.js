@@ -74,6 +74,8 @@ const createAttribute = async (req, res) => {
   }
 };
 
+
+
 const deleteAttribute = async (req, res) => {
   const atrributeUUID = req.body.uuid;
   try {
