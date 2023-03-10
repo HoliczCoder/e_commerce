@@ -84,10 +84,10 @@ model Product {
     price                      Float
     qty                        Int
     weight                     Float?
-    manage_stock               Boolean
-    stock_availability         Boolean
+    manage_stock               Int
+    stock_availability         Int
     tax_class                  Int?
-    status                     Boolean
+    status                     Int
     created_at                 DateTime                     @default(now())
     updated_at                 DateTime                     @default(now()) @updatedAt
     ProductAttributeValueIndex ProductAttributeValueIndex[]
