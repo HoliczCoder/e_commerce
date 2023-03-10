@@ -201,3 +201,5 @@ model ProductAttributeValueIndex {
     @@unique([product_id, attribute_id, option_id])
     @@map("product_attribute_value_index")
 }
+
+
