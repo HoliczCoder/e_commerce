@@ -95,8 +95,33 @@ const createProduct = async (req, res) => {
             },
           });
           if (!option) {
-            ///////////////////////////// so tired
+            res.status(404).json({
+              res: "this attribute not exist",
+            });
+            return;
+            ///////////////////////////// so tired !!!!
           }
+          // Delete old option if any
+          await prisma.productAttributeValueIndex.delete({
+            where: {
+              attribute_id: attr.attribute_id,
+            },
+          });
+          // Insert new option
+          await prisma.productAttributeValueIndex.create({
+            data: {
+              product_id: product.product_id,
+              attribute_id: attr.attribute_id,
+              option_id: option.attribute_option_id,
+              option_text: option.option_text,
+            },
+          });
+        } else {
+          await prisma.productAttributeValueIndex.create({
+            data: {
+              option_text: attribute.value,
+            },
+          });
         }
       }
     }
