@@ -109,6 +109,8 @@ model ProductDescription {
     meta_title                     String?
     meta_description               String?
     meta_keywords                  String?
+
+    @@map("product_description")
 }
 
 model VariantGroup {
@@ -229,6 +231,7 @@ model ProductCateogory {
     product_id          Int
 
     @@unique([category_id, product_id])
+    @@map("product_cateogory")
 }
 
 model CategoryDescription {
@@ -243,4 +246,6 @@ model CategoryDescription {
     meta_keywords                    String?
     meta_description                 String?
     url_key                          String
+
+    @@map("category_description")
 }
