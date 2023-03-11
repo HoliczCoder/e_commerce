@@ -102,4 +102,29 @@ const saveAttribute = async (product, attributes) => {
   }
 };
 
-module.exports = { saveAttribute };
+const saveCategory = async (product, categories) => {
+  const promises = [];
+  for (let i = 0; i < categories.length; i += 1) {
+    const category = await prisma.category.findUnique({
+      where: {
+        category_id: categories[i],
+      },
+    });
+    if (category) {
+      promises.push(
+        prisma.productCateogory.create({
+          data: {
+            category_id: categories[i],
+            product_id: product.product_id,
+          },
+        })
+      );
+    } else {
+      return false;
+    }
+  }
+  //
+  return await Promise.allSettled(promises);
+};
+
+module.exports = { saveAttribute, saveCategory };
