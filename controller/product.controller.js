@@ -1,5 +1,6 @@
 const { PrismaClient } = require("@prisma/client");
 const prisma = new PrismaClient();
+const { saveAttribute } = require("../service/product.service");
 
 const createProduct = async (req, res) => {
   try {
@@ -23,108 +24,19 @@ const createProduct = async (req, res) => {
       },
     });
 
-    // save ProductAttributeValueIndex
-    // const attributes = await prisma.product.findMany({});
     const attributes = req.body.attributes;
-    for (let i = 0; i < attributes.length; i += 1) {
-      const attribute = attributes[i];
-      if (attribute.value) {
-        const attr = await prisma.atrribute.findUnique({
-          where: {
-            attribute_code: attribute.attribute_code,
-          },
-        });
-        if (!attr) {
-          return;
-        }
-        if (attr.type === "textarea" || attr.type === "text") {
-          const flag = await prisma.productAttributeValueIndex.findUnique({
-            where: {
-              product_id: product.product_id,
-            },
-          });
-          if (flag) {
-            await prisma.productAttributeValueIndex.update({
-              where: {
-                product_id: product.product_id,
-              },
-              data: {
-                option_text: attribute.value.trim(),
-              },
-            });
-          } else {
-            await prisma.productAttributeValueIndex.create({
-              data: {
-                product_id: product.product_id,
-                attribute_id: attr.attribute_id,
-                option_text: attribute.value.trim(),
-              },
-            });
-          }
-        } else if (attr.type === "multiselect") {
-          await Promise.all(
-            attribute.value.map(() => {
-              (async () => {
-                const option = await prisma.attributeOption.findUnique({
-                  where: {
-                    attribute_option_id: attribute.value,
-                  },
-                });
-                if (!option) {
-                  res.status(404).json({
-                    res: "this attribute not exist",
-                  });
-                  return;
-                }
-                await prisma.productAttributeValueIndex.create({
-                  data: {
-                    product_id: product.product_id,
-                    attribute_id: attr.attribute_id,
-                    option_id: option.attribute_option_id,
-                    option_text: option.option_text,
-                  },
-                });
-              })();
-            })
-          );
-          //
-        } else if (attr.type === "select") {
-          const option = await prisma.attributeOption.findUnique({
-            where: {
-              attribute_option_id: attribute.value,
-            },
-          });
-          if (!option) {
-            res.status(404).json({
-              res: "this attribute not exist",
-            });
-            return;
-            ///////////////////////////// so tired !!!!
-          }
-          // Delete old option if any
-          await prisma.productAttributeValueIndex.delete({
-            where: {
-              attribute_id: attr.attribute_id,
-            },
-          });
-          // Insert new option
-          await prisma.productAttributeValueIndex.create({
-            data: {
-              product_id: product.product_id,
-              attribute_id: attr.attribute_id,
-              option_id: option.attribute_option_id,
-              option_text: option.option_text,
-            },
-          });
-        } else {
-          await prisma.productAttributeValueIndex.create({
-            data: {
-              option_text: attribute.value,
-            },
-          });
-        }
-      }
+
+    // save Attribute
+    await saveAttribute(product, attributes);
+    // @ts-ignore
+    if (saveAttribute == false) {
+      res.status(404).json({
+        error: "save attribute failed",
+      });
     }
+
+    // save Category
+    // Pending
 
     res.status(200).res({ res: product });
   } catch (error) {

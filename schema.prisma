@@ -92,6 +92,8 @@ model Product {
     updated_at                 DateTime                     @default(now()) @updatedAt
     ProductAttributeValueIndex ProductAttributeValueIndex[]
     ProductDescription         ProductDescription?
+    // link between product and cateogry
+    ProductCateogory           ProductCateogory[]
 
     @@map("product")
 }
@@ -189,17 +191,56 @@ model AttributeOption {
 
 model ProductAttributeValueIndex {
     product_attribute_value_index_id Int              @id @default(autoincrement())
+    uuid                             String           @unique @default(dbgenerated("(replace(uuid(),'-',''))"))
     // many to many between product and attribute
-    product                          Product          @relation(fields: [product_id], references: [product_id])
+    product                          Product          @relation(fields: [product_id], references: [product_id], onDelete: Cascade)
     product_id                       Int
-    attribute                        Atrribute        @relation(fields: [attribute_id], references: [attribute_id], onDelete: Cascade, onUpdate: Cascade)
+    attribute                        Atrribute        @relation(fields: [attribute_id], references: [attribute_id], onDelete: Cascade)
     attribute_id                     Int
     attribute_option                 AttributeOption? @relation(fields: [option_id], references: [attribute_option_id])
     option_id                        Int?
     option_text                      String?
 
     @@unique([product_id, attribute_id, option_id])
+    @@unique([product_id, attribute_id]) // a product can have only one attribute setting
     @@map("product_attribute_value_index")
 }
 
+model Category {
+    category_id         Int                  @id @default(autoincrement())
+    uuid                String               @unique @default(dbgenerated("(replace(uuid(),'-',''))"))
+    status              Int
+    parent_id           Int?
+    include_in_nav      Int
+    position            Int?
+    created_at          DateTime             @default(now())
+    updated_at          DateTime             @default(now()) @updatedAt
+    ProductCateogory    ProductCateogory[]
+    CategoryDescription CategoryDescription?
 
+    @@map("category")
+}
+
+model ProductCateogory {
+    product_category_id Int      @id @default(autoincrement())
+    Category            Category @relation(fields: [category_id], references: [category_id], onDelete: Cascade)
+    category_id         Int
+    Product             Product  @relation(fields: [product_id], references: [product_id], onDelete: Cascade)
+    product_id          Int
+
+    @@unique([category_id, product_id])
+}
+
+model CategoryDescription {
+    category_description_id          Int      @id @default(autoincrement())
+    Category                         Category @relation(fields: [category_description_category_id], references: [category_id], onDelete: Cascade)
+    category_description_category_id Int      @unique
+    name                             String
+    short_description                String?
+    description                      String?
+    image                            String?
+    meta_title                       String?
+    meta_keywords                    String?
+    meta_description                 String?
+    url_key                          String
+}
