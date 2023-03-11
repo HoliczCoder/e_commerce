@@ -45,7 +45,6 @@ const createProduct = async (req, res) => {
         return;
       }
     }
-    // Pending
 
     res.status(200).res({ res: product });
   } catch (error) {

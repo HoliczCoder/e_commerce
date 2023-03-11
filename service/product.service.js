@@ -5,6 +5,7 @@ const saveAttribute = async (product, attributes) => {
   for (let i = 0; i < attributes.length; i += 1) {
     const attribute = attributes[i];
     if (attribute.value) {
+      // find atrribute
       const attr = await prisma.atrribute.findUnique({
         where: {
           attribute_code: attribute.attribute_code,
@@ -45,7 +46,10 @@ const saveAttribute = async (product, attributes) => {
           });
         }
       } else if (attr.type === "multiselect") {
+        // this shit is not good
+        return;
         return await Promise.all(
+          // why attribute have so much value? have to check create attribute again
           attribute.value.map(() => {
             (async () => {
               const option = await prisma.attributeOption.findUnique({
