@@ -15,20 +15,12 @@ const createCategory = async (req, res) => {
       data: {
         category_description_category_id: category.category_id,
         name: req.body.name,
-        ...(req.body.short_description && {
-          short_description: req.body.short_description,
-        }),
-        ...(req.body.description && {
-          description: req.body.description,
-        }),
-        ...(req.body.meta_title && { meta_title: req.body.meta_title }),
-        ...(req.body.image && { image: req.body.image }),
-        ...(req.body.meta_keywords && {
-          meta_keywords: req.body.meta_keywords,
-        }),
-        ...(req.body.meta_description && {
-          meta_description: req.body.meta_description,
-        }),
+        short_description: req.body.short_description,
+        description: req.body.description,
+        meta_title: req.body.meta_title,
+        image: req.body.image,
+        meta_keywords: req.body.meta_keywords,
+        meta_description: req.body.meta_description,
         url_key: req.body.url_key,
       },
     });
