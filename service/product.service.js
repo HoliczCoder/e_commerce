@@ -187,4 +187,57 @@ const updateCategory = async (product, categories) => {
   return await Promise.allSettled(promises);
 };
 
-module.exports = { saveAttribute, saveCategory, updateCategory };
+const saveDescription = async (product, productDescription) => {
+  try {
+    return await prisma.productDescription.create({
+      data: {
+        product_description_product_id: product.product_id,
+        name: productDescription.name,
+        description: productDescription.description,
+        short_description: productDescription.short_description,
+        url_key: productDescription.url_key,
+        meta_title: productDescription.meta_title,
+        meta_description: productDescription.meta_description,
+        meta_keywords: productDescription.meta_keywords,
+      },
+    });
+  } catch (error) {
+    console.log(error);
+    return false;
+  }
+};
+
+const updateDescription = async (product, productDescription) => {
+  try {
+    // delete first
+    await prisma.productDescription.delete({
+      where: {
+        product_description_product_id: product.product_id,
+      },
+    });
+    // then recreate
+    return await prisma.productDescription.create({
+      data: {
+        product_description_product_id: product.product_id,
+        name: productDescription.name,
+        description: productDescription.description,
+        short_description: productDescription.short_description,
+        url_key: productDescription.url_key,
+        meta_title: productDescription.meta_title,
+        meta_description: productDescription.meta_description,
+        meta_keywords: productDescription.meta_keywords,
+      },
+    });
+  } catch (error) {
+    console.log(error);
+    return false;
+  }
+};
+
+module.exports = {
+  saveAttribute,
+  saveCategory,
+  updateCategory,
+  saveDescription,
+  updateDescription,
+};

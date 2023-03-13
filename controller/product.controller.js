@@ -1,6 +1,11 @@
 const { PrismaClient } = require("@prisma/client");
 const prisma = new PrismaClient();
-const { saveAttribute, saveCategory } = require("../service/product.service");
+const {
+  saveAttribute,
+  saveCategory,
+  saveDescription,
+  updateDescription
+} = require("../service/product.service");
 
 const createProduct = async (req, res) => {
   try {
@@ -19,6 +24,18 @@ const createProduct = async (req, res) => {
         status: req.body.status,
       },
     });
+    // save product Description
+    const productDescription = req.body.productDescription;
+    if (productDescription) {
+      await saveDescription(product, productDescription);
+      // @ts-ignore
+      if (saveDescription == false) {
+        res.status(404).json({
+          error: "save product description failed",
+        });
+        return;
+      }
+    }
 
     // save Attribute
     const attributes = req.body.attributes;
@@ -74,6 +91,19 @@ const updateProduct = async (req, res) => {
         status: req.body.status,
       },
     });
+
+    // update product Description
+    const productDescription = req.body.productDescription;
+    if (productDescription) {
+      await updateDescription(product, productDescription);
+      // @ts-ignore
+      if (updateDescription == false) {
+        res.status(404).json({
+          error: "save product description failed",
+        });
+        return;
+      }
+    }
 
     // update Attribute
     const attributes = req.body.attributes;
