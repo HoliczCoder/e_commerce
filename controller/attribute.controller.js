@@ -55,6 +55,11 @@ const createAttribute = async (req, res) => {
       );
     }
     if (attributeData.options.length) {
+      if (req.body.type == "text" || req.body.type == "textarea") {
+        res.status(400).json({
+          res: "type text and textarea cannot have options",
+        });
+      }
       await createNewAttributeOption(
         attributeData.options,
         atrribute.attribute_id,
@@ -73,8 +78,6 @@ const createAttribute = async (req, res) => {
     });
   }
 };
-
-
 
 const deleteAttribute = async (req, res) => {
   const atrributeUUID = req.body.uuid;
@@ -213,6 +216,11 @@ const updateAttribute = async (req, res) => {
     }
     // update attribute options
     if (attributeData.options.length) {
+      if (attributeData.type == "text" || attributeData.type == "textarea") {
+        res.status(400).json({
+          res: "type text and textarea cannot have options",
+        });
+      }
       const attribute_options = await prisma.attributeOption.findMany({
         where: {
           attribute_id: attributeData.attribute_id,
