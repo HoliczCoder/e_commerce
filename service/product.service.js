@@ -143,4 +143,48 @@ const saveCategory = async (product, categories) => {
   return await Promise.allSettled(promises);
 };
 
-module.exports = { saveAttribute, saveCategory };
+const updateCategory = async (product, categories) => {
+  const promises = [];
+  // Delete all categories
+  for (let i = 0; i < categories.length; i += 1) {
+    promises.push(
+      prisma.productCateogory.delete({
+        where: {
+          category_id_product_id: {
+            category_id: categories[i],
+            product_id: product.product_id,
+          },
+        },
+      })
+    );
+  }
+
+  await Promise.allSettled(promises);
+
+  promises = [];
+
+  // insert new categories
+  for (let i = 0; i < categories.length; i += 1) {
+    const category = await prisma.category.findUnique({
+      where: {
+        category_id: categories[i],
+      },
+    });
+    if (category) {
+      promises.push(
+        prisma.productCateogory.create({
+          data: {
+            category_id: categories[i],
+            product_id: product.product_id,
+          },
+        })
+      );
+    } else {
+      return false;
+    }
+  }
+  //
+  return await Promise.allSettled(promises);
+};
+
+module.exports = { saveAttribute, saveCategory, updateCategory };
