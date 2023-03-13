@@ -46,7 +46,7 @@ const createProduct = async (req, res) => {
       }
     }
 
-    res.status(200).res({ res: product });
+    res.status(200).json({ res: product });
   } catch (error) {
     res.status(500).json({
       error: error,

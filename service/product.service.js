@@ -81,15 +81,27 @@ const saveAttribute = async (product, attributes) => {
         if (!option) {
           return false;
         }
-        // Delete old option if any
-        await prisma.productAttributeValueIndex.delete({
-          where: {
-            product_id_attribute_id: {
-              product_id: product.product_id,
-              attribute_id: attr.attribute_id,
+        // If exist
+        const isExistProductAttributeValueIndex =
+          await prisma.productAttributeValueIndex.findUnique({
+            where: {
+              product_id_attribute_id: {
+                product_id: product.product_id,
+                attribute_id: attr.attribute_id,
+              },
             },
-          },
-        });
+          });
+        // Delete old option if any //
+        if (isExistProductAttributeValueIndex) {
+          await prisma.productAttributeValueIndex.delete({
+            where: {
+              product_id_attribute_id: {
+                product_id: product.product_id,
+                attribute_id: attr.attribute_id,
+              },
+            },
+          });
+        }
         // Insert new option
         return await prisma.productAttributeValueIndex.create({
           data: {
