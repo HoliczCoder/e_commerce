@@ -32,6 +32,8 @@ model AdminUser {
     full_name     String?
     created_at    DateTime @default(now())
     updated_at    DateTime @default(now()) @updatedAt
+
+    @@map("admin_user")
 }
 
 model CustomerAddress {
@@ -259,4 +261,37 @@ model CategoryDescription {
     url_key                          String
 
     @@map("category_description")
+}
+
+model Cart {
+    cart_id               Int      @id @default(autoincrement())
+    uuid                  String   @unique @default(dbgenerated("(replace(uuid(),'-',''))"))
+    sid                   String?
+    currency              String
+    customer_id           Int?
+    customer_group_id     Int?
+    customer_email        String?
+    customer_full_name    String?
+    user_ip               String?
+    status                Int
+    coupon                Int?
+    shipping_fee_excl_tax Float?
+    shipping_fee_incl_tax Float?
+    discount_amount       Float?
+    sub_total             Float
+    total_qty             Int
+    total_weight          Float?
+    tax_amount            Float
+    grand_total           Float?
+    shipping_method       String
+    shipping_method_name  String
+    shipping_address_id   Int?
+    payment_method        String
+    payment_method_name   String
+    billing_address_id    Int
+    shipping_note         String
+    created_at            DateTime @default(now())
+    updated_at            DateTime @default(now()) @updatedAt
+
+    @@map("cart")
 }
