@@ -286,12 +286,23 @@ model Cart {
     shipping_method       String
     shipping_method_name  String
     shipping_address_id   Int?
-    payment_method        String
-    payment_method_name   String
-    billing_address_id    Int
-    shipping_note         String
+    billing_address_id    Int?
+    shipping_note         String?
     created_at            DateTime @default(now())
     updated_at            DateTime @default(now()) @updatedAt
 
     @@map("cart")
+}
+
+model CartAddress {
+    cart_address_id Int    @id @default(autoincrement())
+    uuid            String @unique @default(dbgenerated("(replace(uuid(),'-',''))"))
+    full_name       String
+    postcode        String
+    telephone       String
+    country         String
+    province        String
+    city            String
+    address_1       String
+    address_2       String
 }
