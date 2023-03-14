@@ -19,6 +19,7 @@ model Customer {
     created_at       DateTime         @default(now())
     updated_at       DateTime         @default(now()) @updatedAt
     customer_address CustomerAddress?
+    Order            Order[]
 
     @@map("customer")
 }
@@ -107,6 +108,8 @@ model Product {
     ProductDescription         ProductDescription?
     // link between product and cateogry
     ProductCateogory           ProductCateogory[]
+    // one product belong to many cart item
+    CartItem                   CartItem[]
 
     @@map("product")
 }
@@ -264,8 +267,8 @@ model CategoryDescription {
 }
 
 model Cart {
-    cart_id               Int      @id @default(autoincrement())
-    uuid                  String   @unique @default(dbgenerated("(replace(uuid(),'-',''))"))
+    cart_id               Int        @id @default(autoincrement())
+    uuid                  String     @unique @default(dbgenerated("(replace(uuid(),'-',''))"))
     sid                   String?
     currency              String
     customer_id           Int?
@@ -288,21 +291,126 @@ model Cart {
     shipping_address_id   Int?
     billing_address_id    Int?
     shipping_note         String?
-    created_at            DateTime @default(now())
-    updated_at            DateTime @default(now()) @updatedAt
+    created_at            DateTime   @default(now())
+    updated_at            DateTime   @default(now()) @updatedAt
+    // one cart have many cart items
+    CartItem              CartItem[]
+    // one cart have one order
+    Order                 Order?
 
     @@map("cart")
 }
 
 model CartAddress {
-    cart_address_id Int    @id @default(autoincrement())
-    uuid            String @unique @default(dbgenerated("(replace(uuid(),'-',''))"))
-    full_name       String
-    postcode        String
-    telephone       String
-    country         String
-    province        String
-    city            String
-    address_1       String
-    address_2       String
+    cart_address_id Int     @id @default(autoincrement())
+    uuid            String  @unique @default(dbgenerated("(replace(uuid(),'-',''))"))
+    full_name       String?
+    postcode        String?
+    telephone       String?
+    country         String?
+    province        String?
+    city            String?
+    address_1       String?
+    address_2       String?
+
+    @@map("cart_address")
+}
+
+model CartItem {
+    cart_item_id           Int      @id @default(autoincrement())
+    uuid                   String   @unique @default(dbgenerated("(replace(uuid(),'-',''))"))
+    Cart                   Cart     @relation(fields: [cart_id], references: [cart_id], onDelete: Cascade, onUpdate: Cascade)
+    cart_id                Int
+    Product                Product  @relation(fields: [product_id], references: [product_id], onDelete: Cascade, onUpdate: NoAction)
+    product_id             Int
+    product_sku            String
+    product_name           String
+    thumbnail              String
+    product_weigth         Float?
+    product_price          Float
+    product_price_incl_tax Float
+    qty                    Int
+    final_price            Float
+    final_price_incl_tax   Float
+    tax_percent            Float
+    tax_amount             Float
+    discount_amount        Float
+    total                  Float
+    variant_group_id       Int?
+    variant_options        String?
+    product_custom_options String?
+    created_at             DateTime @default(now())
+    updated_at             DateTime @default(now()) @updatedAt
+
+    @@map("cart_item")
+}
+
+model Order {
+    order_id              Int            @id @default(autoincrement())
+    uuid                  String         @unique @default(dbgenerated("(replace(uuid(),'-',''))"))
+    sid                   String?
+    order_number          String         @unique
+    // if cart is deleted, order not need to be deleted
+    Cart                  Cart           @relation(fields: [cart_id], references: [cart_id])
+    cart_id               Int            @unique
+    currency              String
+    // dont understand why customer_id default set to null?
+    Customer              Customer       @relation(fields: [customer_id], references: [customer_id])
+    customer_id           Int
+    customer_email        String?
+    customer_full_name    String?
+    user_ip               String?
+    user_agent            String?
+    coupon                String?
+    shipping_fee_excl_tax Float?
+    shipping_fee_incl_tax Float?
+    discount_amount       Float?
+    sub_total             Float
+    total_qty             Int
+    total_weight          Float?
+    tax_amount            Float
+    shipping_note         String?
+    grand_total           Float
+    shipping_method       String?
+    shipping_method_name  String?
+    shipping_address_id   Int?
+    payment_method        String?
+    payment_method_name   String?
+    billing_address_id    Int?
+    shipment_status       Int            @default(0)
+    payment_status        Int            @default(0)
+    created_at            DateTime       @default(now())
+    updated_at            DateTime       @default(now()) @updatedAt
+    // one order match with one OrderActivity 
+    OrderActivity         OrderActivity?
+
+    @@map("order")
+}
+
+model OrderActivity {
+    order_activity_id       Int      @id @default(autoincrement())
+    Order                   Order    @relation(fields: [order_activity_id], references: [order_id])
+    order_activity_order_id Int      @unique
+    comment                 String
+    customer_notified       Int
+    created_at              DateTime @default(now())
+    updated_at              DateTime @default(now()) @updatedAt
+
+    //   order                       Order         @relation(fields: [order_activity_order_id], references: [order_id])
+    @@map("order_activity")
+}
+
+model OrderAddress {
+    order_address_id Int     @id @default(autoincrement())
+    uuid             String  @unique @default(dbgenerated("(replace(uuid(),'-',''))"))
+    full_name        String?
+    postcode         String?
+    telephone        String?
+    country          String?
+    province         String?
+    city             String?
+    address_1        String?
+    address_2        String?
+
+    @@map("order_address")
 }
