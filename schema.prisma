@@ -76,8 +76,8 @@ model Product {
     variant_group              VariantGroup?                @relation(fields: [variant_group_id], references: [variant_group_id])
     variant_group_id           Int?
     visibility                 Int                          @default(1)
-    //  why do we need attribute_group here, we can retrieve AtrributeGroup through VariantGroup?
-    attribute_group            AtrributeGroup?              @relation(fields: [group_id], references: [attribute_group_id])
+    //  why do we need attribute_group here, we can retrieve AtrributeGroup through VariantGroup? // read my old comment I find dumb
+    attribute_group            AtrributeGroup?              @relation(fields: [group_id], references: [attribute_group_id])  
     group_id                   Int?
     image                      Int?
     sku                        String                       @unique

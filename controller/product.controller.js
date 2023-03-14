@@ -5,7 +5,7 @@ const {
   saveCategory,
   updateCategory,
   saveDescription,
-  updateDescription
+  updateDescription,
 } = require("../service/product.service");
 
 const createProduct = async (req, res) => {
@@ -140,7 +140,57 @@ const updateProduct = async (req, res) => {
   }
 };
 
+const deleteProduct = async (req, res) => {
+  try {
+    const deleteProduct = await prisma.product.delete({
+      where: {
+        product_id: req.body.product_id,
+      },
+    });
+    res.status(200).json({
+      res: deleteProduct,
+    });
+  } catch (error) {
+    res.status(500).json({
+      error: error,
+    });
+  }
+};
+
+const getProduct = async (req, res) => {
+  try {
+    const getProduct = await prisma.product.findUnique({
+      where: {
+        product_id: req.body.product_id,
+      },
+    });
+    res.status(200).json({
+      data: getProduct,
+    });
+  } catch (error) {
+    res.status(500).json({
+      error: error,
+    });
+  }
+};
+
+const getAllProduct = async (req, res) => {
+  try {
+    const getAllProduct = await prisma.product.findMany({});
+    res.status(200).json({
+      data: getAllProduct,
+    });
+  } catch (error) {
+    res.status(500).json({
+      error: error,
+    });
+  }
+};
+
 module.exports = {
   createProduct,
   updateProduct,
+  deleteProduct,
+  getProduct,
+  getAllProduct,
 };
