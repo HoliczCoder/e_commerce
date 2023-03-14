@@ -3,6 +3,7 @@ const prisma = new PrismaClient();
 const {
   saveAttribute,
   saveCategory,
+  updateCategory,
   saveDescription,
   updateDescription
 } = require("../service/product.service");
@@ -121,9 +122,9 @@ const updateProduct = async (req, res) => {
     // update Category
     const categories = req.body.categories;
     if (categories) {
-      await saveCategory(product, categories);
+      await updateCategory(product, categories);
       // @ts-ignore
-      if (saveCategory == false) {
+      if (updateCategory == false) {
         res.status(404).json({
           error: "update category failed",
         });

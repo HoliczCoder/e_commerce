@@ -144,26 +144,24 @@ const saveCategory = async (product, categories) => {
 };
 
 const updateCategory = async (product, categories) => {
-  const promises = [];
+  // If exist productCateogory
+  const ifExistProductCateogory = await prisma.productCateogory.findMany({
+    where: {
+      product_id: product.product_id,
+    },
+  });
   // Delete all categories
-  for (let i = 0; i < categories.length; i += 1) {
-    promises.push(
-      prisma.productCateogory.delete({
-        where: {
-          category_id_product_id: {
-            category_id: categories[i],
-            product_id: product.product_id,
-          },
-        },
-      })
-    );
+  if (ifExistProductCateogory) {
+    await prisma.productCateogory.deleteMany({
+      where: {
+        product_id: product.product_id,
+      },
+    });
   }
-
-  await Promise.allSettled(promises);
 
   promises = [];
 
-  // insert new categories
+  // Insert new categories
   for (let i = 0; i < categories.length; i += 1) {
     const category = await prisma.category.findUnique({
       where: {
@@ -209,12 +207,21 @@ const saveDescription = async (product, productDescription) => {
 
 const updateDescription = async (product, productDescription) => {
   try {
+    // if exist
+    const ifExistProductDescription =
+      await prisma.productDescription.findUnique({
+        where: {
+          product_description_product_id: product.product_id,
+        },
+      });
     // delete first
-    await prisma.productDescription.delete({
-      where: {
-        product_description_product_id: product.product_id,
-      },
-    });
+    if (ifExistProductDescription) {
+      await prisma.productDescription.delete({
+        where: {
+          product_description_product_id: product.product_id,
+        },
+      });
+    }
     // then recreate
     return await prisma.productDescription.create({
       data: {
