@@ -23,6 +23,17 @@ model Customer {
     @@map("customer")
 }
 
+model AdminUser {
+    admin_user_id Int      @id @default(autoincrement())
+    uuid          String   @unique @default(dbgenerated("(replace(uuid(),'-',''))"))
+    status        Int
+    email         String
+    password      String
+    full_name     String?
+    created_at    DateTime @default(now())
+    updated_at    DateTime @default(now()) @updatedAt
+}
+
 model CustomerAddress {
     customer_address_id Int      @id @default(autoincrement())
     uuid                String   @unique @default(dbgenerated("(replace(uuid(),'-',''))"))
@@ -77,7 +88,7 @@ model Product {
     variant_group_id           Int?
     visibility                 Int                          @default(1)
     //  why do we need attribute_group here, we can retrieve AtrributeGroup through VariantGroup? // read my old comment I find dumb
-    attribute_group            AtrributeGroup?              @relation(fields: [group_id], references: [attribute_group_id])  
+    attribute_group            AtrributeGroup?              @relation(fields: [group_id], references: [attribute_group_id])
     group_id                   Int?
     image                      Int?
     sku                        String                       @unique
