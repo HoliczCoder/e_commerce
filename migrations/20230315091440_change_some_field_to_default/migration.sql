@@ -1,9 +1,3 @@
-/*
-  Warnings:
-
-  - You are about to drop the column `image` on the `product` table. All the data in the column will be lost.
-
-*/
 -- AlterTable
 ALTER TABLE `admin_user` MODIFY `uuid` VARCHAR(191) NOT NULL DEFAULT (replace(uuid(),'-',''));
 
@@ -58,9 +52,8 @@ ALTER TABLE `order_item` MODIFY `uuid` VARCHAR(191) NOT NULL DEFAULT (replace(uu
 ALTER TABLE `payment_transaction` MODIFY `uuid` VARCHAR(191) NOT NULL DEFAULT (replace(uuid(),'-',''));
 
 -- AlterTable
-ALTER TABLE `product` DROP COLUMN `image`,
-    ADD COLUMN `thumbnail` VARCHAR(191) NULL,
-    MODIFY `uuid` VARCHAR(191) NOT NULL DEFAULT (replace(uuid(),'-',''));
+ALTER TABLE `product` MODIFY `uuid` VARCHAR(191) NOT NULL DEFAULT (replace(uuid(),'-','')),
+    MODIFY `image` VARCHAR(191) NULL;
 
 -- AlterTable
 ALTER TABLE `product_attribute_value_index` MODIFY `uuid` VARCHAR(191) NOT NULL DEFAULT (replace(uuid(),'-',''));

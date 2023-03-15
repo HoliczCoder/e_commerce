@@ -25,6 +25,7 @@ const addMineCartItem = async (req, res) => {
     const product = prisma.product.findUnique({
       where: {
         sku: sku,
+        status: 1,
       },
       include: {
         ProductDescription: true,
@@ -54,8 +55,14 @@ const addMineCartItem = async (req, res) => {
         product_id: product.product_id,
         product_sku: sku,
         product_name: product.ProductDescription.name,
-        thumbnail: product.thumbnail,
-        // pending
+        thumbnail: product.image,
+        product_weigth: product.weight,
+        product_price: product.price,
+        product_price_incl_tax: product.price,
+        final_price: product.price,
+        final_price_incl_tax: product.price,
+        // pending pending pending pending pending pending
+        qty: qty,
       },
     });
   }
