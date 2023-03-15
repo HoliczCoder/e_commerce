@@ -110,6 +110,7 @@ model Product {
     ProductCateogory           ProductCateogory[]
     // one product belong to many cart item
     CartItem                   CartItem[]
+    OrderItem                  OrderItem[]
 
     @@map("product")
 }
@@ -346,16 +347,16 @@ model CartItem {
 }
 
 model Order {
-    order_id              Int            @id @default(autoincrement())
-    uuid                  String         @unique @default(dbgenerated("(replace(uuid(),'-',''))"))
+    order_id              Int                 @id @default(autoincrement())
+    uuid                  String              @unique @default(dbgenerated("(replace(uuid(),'-',''))"))
     sid                   String?
-    order_number          String         @unique
+    order_number          String              @unique
     // if cart is deleted, order not need to be deleted
-    Cart                  Cart           @relation(fields: [cart_id], references: [cart_id])
-    cart_id               Int            @unique
+    Cart                  Cart                @relation(fields: [cart_id], references: [cart_id])
+    cart_id               Int                 @unique
     currency              String
     // dont understand why customer_id default set to null?
-    Customer              Customer       @relation(fields: [customer_id], references: [customer_id])
+    Customer              Customer            @relation(fields: [customer_id], references: [customer_id])
     customer_id           Int
     customer_email        String?
     customer_full_name    String?
@@ -377,26 +378,30 @@ model Order {
     payment_method        String?
     payment_method_name   String?
     billing_address_id    Int?
-    shipment_status       Int            @default(0)
-    payment_status        Int            @default(0)
-    created_at            DateTime       @default(now())
-    updated_at            DateTime       @default(now()) @updatedAt
+    shipment_status       Int                 @default(0)
+    payment_status        Int                 @default(0)
+    created_at            DateTime            @default(now())
+    updated_at            DateTime            @default(now()) @updatedAt
     // one order match with one OrderActivity 
     OrderActivity         OrderActivity?
+    // one order have many order item
+    OrderItem             OrderItem[]
+    // one order belong to one shipment
+    Shipment              Shipment?
+    PaymentTransaction    PaymentTransaction?
 
     @@map("order")
 }
 
 model OrderActivity {
     order_activity_id       Int      @id @default(autoincrement())
-    Order                   Order    @relation(fields: [order_activity_id], references: [order_id])
+    Order                   Order    @relation(fields: [order_activity_id], references: [order_id], onDelete: Cascade)
     order_activity_order_id Int      @unique
     comment                 String
     customer_notified       Int
     created_at              DateTime @default(now())
     updated_at              DateTime @default(now()) @updatedAt
 
-    //   order                       Order         @relation(fields: [order_activity_order_id], references: [order_id])
     @@map("order_activity")
 }
 
@@ -413,4 +418,63 @@ model OrderAddress {
     address_2        String?
 
     @@map("order_address")
+}
+
+model OrderItem {
+    order_item_id          Int     @id @default(autoincrement())
+    uuid                   String  @unique @default(dbgenerated("(replace(uuid(),'-',''))"))
+    Order                  Order   @relation(fields: [order_item_order_id], references: [order_id])
+    order_item_order_id    Int
+    Product                Product @relation(fields: [product_id], references: [product_id], onDelete: NoAction, onUpdate: NoAction)
+    product_id             Int
+    referer                Int?
+    product_sku            String
+    product_name           String
+    thumbnail              String?
+    product_weight         Float?
+    product_price          Float
+    product_price_incl_tax Float
+    qty                    Int
+    final_price            Float
+    final_price_incl_tax   Float
+    tax_percent            Float
+    tax_amount             Float
+    discount_amount        Float
+    total                  Float
+    variant_group_id       Int?
+    variant_options        String?
+    product_custom_options String?
+    requested_data         String?
+
+    @@map("order_item")
+}
+
+model Shipment {
+    shipment_id       Int      @id @default(autoincrement())
+    uuid              String   @unique @default(dbgenerated("(replace(uuid(),'-',''))"))
+    Order             Order    @relation(fields: [shipment_order_id], references: [order_id], onDelete: Cascade)
+    shipment_order_id Int      @unique
+    carrier_name      String?
+    tracking_number   String?
+    created_at        DateTime @default(now())
+    updated_at        DateTime @default(now()) @updatedAt
+
+    @@map("shipment")
+}
+
+model PaymentTransaction {
+    payment_transaction_id       Int      @id @default(autoincrement())
+    uuid                         String   @unique @default(dbgenerated("(replace(uuid(),'-',''))"))
+    Order                        Order    @relation(fields: [payment_transaction_order_id], references: [order_id], onDelete: Cascade, onUpdate: Cascade)
+    payment_transaction_order_id Int      @unique
+    transaction_id               String?  @unique
+    transaction_type             String
+    amount                       Float
+    parent_transaction_id        String?
+    payment_action               String?
+    additional_information       String?
+    created_at                   DateTime @default(now())
+    updated_at                   DateTime @default(now()) @updatedAt
+
+    @@map("payment_transaction")
 }
