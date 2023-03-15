@@ -27,7 +27,12 @@ const createProduct = async (req, res) => {
     });
     // save product Description
     const productDescription = req.body.productDescription;
-    if (productDescription) {
+    if (!productDescription) {
+      res.status(404).json({
+        error: "product description is a must",
+      });
+      return;
+    } else {
       await saveDescription(product, productDescription);
       // @ts-ignore
       if (saveDescription == false) {
@@ -37,6 +42,7 @@ const createProduct = async (req, res) => {
         return;
       }
     }
+
 
     // save Attribute
     const attributes = req.body.attributes;

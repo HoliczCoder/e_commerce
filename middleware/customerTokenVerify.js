@@ -5,7 +5,8 @@ const { PrismaClient } = require("@prisma/client");
 const prisma = new PrismaClient();
 
 module.exports = customerTokenVerify = async (req, res, next) => {
-  const token = req?.headers?.authorization?.split(" ")[1];
+  // get the token
+  const token = req.cookies.token;
   // Get the jwt token from the req
   const sid = uuidv4();
   const guestPayload = { customer: null, sid };
@@ -13,6 +14,8 @@ module.exports = customerTokenVerify = async (req, res, next) => {
   if (!token) {
     // Issue a new token for guest user
     const newToken = generateToken(guestPayload, process.env.KEY, "2d");
+    // set payload for guest user
+    req.customerTokenPayload = guestPayload;
     // Set the new token in the req
     req.token = newToken;
     next();
@@ -39,12 +42,14 @@ module.exports = customerTokenVerify = async (req, res, next) => {
       if (err) {
         // Issue a new token for guest user
         const newToken = generateToken(guestPayload, process.env.KEY, "2d");
+        // set payload for guest user
+        req.customerTokenPayload = guestPayload;
         // Set the new token in the req
         req.token = newToken;
         next();
       } else {
-        // Set the payload in the req
-        req.payload = decoded;
+        // set payload for real user
+        req.customerTokenPayload = decoded;
         next();
       }
     });

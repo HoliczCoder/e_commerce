@@ -93,7 +93,7 @@ model Product {
     //  why do we need attribute_group here, we can retrieve AtrributeGroup through VariantGroup? // read my old comment I find dumb
     attribute_group            AtrributeGroup?              @relation(fields: [group_id], references: [attribute_group_id])
     group_id                   Int?
-    image                      Int?
+    thumbnail                  String?
     sku                        String                       @unique
     price                      Float
     qty                        Int
@@ -271,7 +271,8 @@ model Cart {
     cart_id               Int        @id @default(autoincrement())
     uuid                  String     @unique @default(dbgenerated("(replace(uuid(),'-',''))"))
     sid                   String?
-    currency              String
+    currency              String     @default("USD")
+    // guest user also have cart, so customer_id is no need
     customer_id           Int?
     customer_group_id     Int?
     customer_email        String?
@@ -279,16 +280,17 @@ model Cart {
     user_ip               String?
     status                Int
     coupon                Int?
-    shipping_fee_excl_tax Float?
-    shipping_fee_incl_tax Float?
-    discount_amount       Float?
+    shipping_fee_excl_tax Float?     @default(0.0000)
+    shipping_fee_incl_tax Float?     @default(0.0000)
+    discount_amount       Float?     @default(0.0000)
     sub_total             Float
     total_qty             Int
     total_weight          Float?
-    tax_amount            Float
+    tax_amount            Float      @default(0.0000)
     grand_total           Float?
-    shipping_method       String
-    shipping_method_name  String
+    // dont need to have shipping_methor yet
+    shipping_method       String?
+    shipping_method_name  String?
     shipping_address_id   Int?
     billing_address_id    Int?
     shipping_note         String?
@@ -326,7 +328,7 @@ model CartItem {
     product_id             Int
     product_sku            String
     product_name           String
-    thumbnail              String
+    thumbnail              String?
     product_weigth         Float?
     product_price          Float
     product_price_incl_tax Float
