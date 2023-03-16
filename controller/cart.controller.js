@@ -38,7 +38,7 @@ const addMineCartItem = async (req, res) => {
       });
       return;
     }
-    // create a new cart
+    // create a new cart (which have no product)
     cart = await prisma.cart.create({
       data: {
         customer_id,
@@ -46,6 +46,7 @@ const addMineCartItem = async (req, res) => {
         customer_email,
         customer_group_id,
         sid,
+        status: 1,
       },
     });
     // If everything is fine, add the product to the cart
@@ -59,10 +60,10 @@ const addMineCartItem = async (req, res) => {
         product_weigth: product.weight,
         product_price: product.price,
         product_price_incl_tax: product.price,
+        qty: qty,
         final_price: product.price,
         final_price_incl_tax: product.price,
-        // pending pending pending pending pending pending
-        qty: qty,
+        total: product.price * qty,
       },
     });
   }

@@ -278,13 +278,13 @@ model Cart {
     customer_email        String?
     customer_full_name    String?
     user_ip               String?
-    status                Int
+    status                Int        @default(0)
     coupon                Int?
     shipping_fee_excl_tax Float?     @default(0.0000)
     shipping_fee_incl_tax Float?     @default(0.0000)
     discount_amount       Float?     @default(0.0000)
-    sub_total             Float
-    total_qty             Int
+    sub_total             Float      @default(0.0000)
+    total_qty             Int        @default(0)
     total_weight          Float?
     tax_amount            Float      @default(0.0000)
     grand_total           Float?
