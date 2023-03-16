@@ -1,13 +1,16 @@
 const { PrismaClient } = require("@prisma/client");
 const prisma = new PrismaClient();
+const { addItem } = require("../service/cart.service");
 
 const addMineCartItem = async (req, res) => {
-  const isExistCart = prisma.cart.findUnique({
+  const { sku, qty } = req.body;
+  const item = "";
+  const existCart = prisma.cart.findUnique({
     where: {
       cart_id: req.body.cart_id,
     },
   });
-  if (!isExistCart) {
+  if (!existCart) {
     // create a new cart
     const customerTokenPayload = req.customerTokenPayload;
     // customer is real customer or guest customer is still creating their cart
@@ -20,7 +23,6 @@ const addMineCartItem = async (req, res) => {
       groupId: customer_group_id,
       fullName: customer_full_name,
     } = customer;
-    const { sku, qty } = req.body;
     // get product by sku
     const product = prisma.product.findUnique({
       where: {
@@ -39,34 +41,37 @@ const addMineCartItem = async (req, res) => {
       return;
     }
     // create a new cart (which have no product)
-    cart = await prisma.cart.create({
+    const newCart = await prisma.cart.create({
       data: {
-        customer_id,
-        customer_full_name,
-        customer_email,
-        customer_group_id,
-        sid,
+        customer_id: customer_id,
+        customer_full_name: customer_full_name,
+        customer_email: customer_email,
+        customer_group_id: customer_group_id,
+        sid: sid,
         status: 1,
       },
     });
     // If everything is fine, add the product to the cart
-    const cartItem = await prisma.cartItem.create({
-      data: {
-        cart_id: cart.cart_id,
-        product_id: product.product_id,
-        product_sku: sku,
-        product_name: product.ProductDescription.name,
-        thumbnail: product.image,
-        product_weigth: product.weight,
-        product_price: product.price,
-        product_price_incl_tax: product.price,
-        qty: qty,
-        final_price: product.price,
-        final_price_incl_tax: product.price,
-        total: product.price * qty,
+    item = await addItem(product, qty, newCart);
+  } else {
+    // get product by sku
+    const product = prisma.product.findUnique({
+      where: {
+        sku: sku,
+        status: 1,
+      },
+      include: {
+        ProductDescription: true,
       },
     });
+    //
+    item = await addItem(product, qty, existCart);
   }
+  //
+  res.status(200).json({
+    data: { item },
+  });
+  return;
 };
 
 module.exports = {
