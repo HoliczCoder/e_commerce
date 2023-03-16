@@ -4,6 +4,8 @@ const { addItem } = require("../service/cart.service");
 
 const addMineCartItem = async (req, res) => {
   const { sku, qty } = req.body;
+  // get token
+  const token = req.token ?? req.token;
   const item = "";
   const existCart = prisma.cart.findUnique({
     where: {
@@ -12,6 +14,7 @@ const addMineCartItem = async (req, res) => {
   });
   if (!existCart) {
     // create a new cart
+    // get customer payload
     const customerTokenPayload = req.customerTokenPayload;
     // customer is real customer or guest customer is still creating their cart
     const customer = customerTokenPayload?.customer || {};
@@ -67,6 +70,9 @@ const addMineCartItem = async (req, res) => {
     //
     item = await addItem(product, qty, existCart);
   }
+  // send token to client
+  res.cookies.token = token;
+
   //
   res.status(200).json({
     data: { item },

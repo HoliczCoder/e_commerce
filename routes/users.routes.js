@@ -1,9 +1,8 @@
 var express = require("express");
 var router = express.Router();
-const {createCustomer} = require("../controller/user.controller");
-const {createCustomerSession} = require("../controller/user.controller")
-const customerTokenVerify = require("../middleware/customerTokenVerify")
-
+const { createCustomer } = require("../controller/user.controller");
+const { createCustomerSession } = require("../controller/user.controller");
+const customerTokenVerify = require("../middleware/customerTokenVerify");
 
 /* GET users listing. */
 router.get("/", function (req, res, next) {
@@ -12,6 +11,9 @@ router.get("/", function (req, res, next) {
 
 router.post("/", createCustomer);
 
-router.post("/login", customerTokenVerify , createCustomerSession);
+// router.post("/login", customerTokenVerify , createCustomerSession);
+// why needing middleware here
+
+router.post("/login", createCustomerSession);
 
 module.exports = router;

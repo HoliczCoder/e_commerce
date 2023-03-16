@@ -89,8 +89,10 @@ const createCustomerSession = async (req, res) => {
         // create new token
         // const token = sign(newPayload, JWT_SECRET);
         const token = generateToken(newPayload, JWT_SECRET, "2d");
+        // send token to cookie
+        res.cookies.token = token;
         res.status(200).json({
-          token: token,
+          message: "login successfully",
         });
       }
     }
