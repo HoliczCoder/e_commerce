@@ -3,16 +3,18 @@ const prisma = new PrismaClient();
 
 //product_id: product.product_id, qty
 const addItem = async (product, qty, cart) => {
+  console.log(cart);
+  console.log(product);
   // check if item exist in cart
-  const ifExistCartItem = await prisma.cartItem.findUnique({
+  const ifExistCartItem = await prisma.cartItem.findFirst({
     where: {
       cart_id: cart.cart_id,
-      product: product.product_id,
+      product_id: product.product_id,
     },
   });
   const cartItem = "";
   if (!ifExistCartItem) {
-    // create cartItem
+    // create cartItem   // debug to here
     cartItem = await prisma.cartItem.create({
       data: {
         cart_id: cart.cart_id,

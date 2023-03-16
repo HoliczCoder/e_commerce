@@ -32,7 +32,7 @@ const createCustomer = async (req, res) => {
 const createCustomerSession = async (req, res) => {
   const { body } = req;
   const { email, password } = body;
-  const customer = await prisma.customer.findFirst({
+  const customer = await prisma.customer.findUnique({
     where: {
       email: email,
     },
@@ -56,7 +56,7 @@ const createCustomerSession = async (req, res) => {
       const sid = uuidv4();
       const JWT_SECRET = uuidv4();
       // find user_token_secret
-      const userTokenSecret = await prisma.userTokenSecret.findFirst({
+      const userTokenSecret = await prisma.userTokenSecret.findUnique({
         where: {
           user_id: customer.uuid,
         },
@@ -90,7 +90,7 @@ const createCustomerSession = async (req, res) => {
         // const token = sign(newPayload, JWT_SECRET);
         const token = generateToken(newPayload, JWT_SECRET, "2d");
         // send token to cookie
-        res.cookies.token = token;
+        res.cookie('token', token);
         res.status(200).json({
           message: "login successfully",
         });

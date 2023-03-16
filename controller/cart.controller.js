@@ -4,14 +4,16 @@ const { addItem } = require("../service/cart.service");
 
 const addMineCartItem = async (req, res) => {
   const { sku, qty } = req.body;
-  // get token
-  const token = req.token ?? req.token;
   const item = "";
-  const existCart = prisma.cart.findUnique({
-    where: {
-      cart_id: req.body.cart_id,
-    },
-  });
+  const existCart = "";
+  if (req.body.cart_id) {
+    existCart = await prisma.cart.findUnique({
+      where: {
+        cart_id: req.body.cart_id,
+      },
+    });
+  }
+
   if (!existCart) {
     // create a new cart
     // get customer payload
@@ -21,13 +23,13 @@ const addMineCartItem = async (req, res) => {
     const sid = customerTokenPayload.sid || null;
     // extract the customer info
     const {
-      customerId: customer_id,
+      customer_id: customer_id,
       email: customer_email,
-      groupId: customer_group_id,
-      fullName: customer_full_name,
+      group_id: customer_group_id,
+      full_name: customer_full_name,
     } = customer;
     // get product by sku
-    const product = prisma.product.findUnique({
+    const product = await prisma.product.findFirst({
       where: {
         sku: sku,
         status: 1,
@@ -56,9 +58,16 @@ const addMineCartItem = async (req, res) => {
     });
     // If everything is fine, add the product to the cart
     item = await addItem(product, qty, newCart);
+
+    // get token for guest user dont have cart
+    const token = req.token ?? req.token;
+    // send token to guest user if token exist
+    if (token) {
+      res.cookie("token", token);
+    }
   } else {
     // get product by sku
-    const product = prisma.product.findUnique({
+    const product = await prisma.product.findFirst({
       where: {
         sku: sku,
         status: 1,
@@ -70,8 +79,8 @@ const addMineCartItem = async (req, res) => {
     //
     item = await addItem(product, qty, existCart);
   }
-  // send token to client
-  res.cookies.token = token;
+  // send token to client, user login dont need token
+  // res.cookies.token = token;
 
   //
   res.status(200).json({

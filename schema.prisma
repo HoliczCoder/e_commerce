@@ -79,7 +79,6 @@ model UserTokenSecret {
     created_at           DateTime @default(now())
     updated_at           DateTime @default(now()) @updatedAt
 
-    @@unique([user_id], name: "USER_TOKEN_USER_ID")
     @@map("user_token_secret")
 }
 

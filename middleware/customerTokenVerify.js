@@ -24,13 +24,13 @@ module.exports = customerTokenVerify = async (req, res, next) => {
     const tokenPayload = jwt.decode(token, { complete: true, json: true });
     let secret;
     // Get the secret from database
-    const check = await prisma.user_token_secret.findFirst({
+    const check = await prisma.userTokenSecret.findFirst({
       where: {
         sid: tokenPayload.payload.sid,
         user_id: tokenPayload.payload.customer.uuid,
       },
     });
-    if (check) {
+    if (!check) {
       // This is guest user
       secret = process.env.KEY;
     } else {
@@ -50,6 +50,7 @@ module.exports = customerTokenVerify = async (req, res, next) => {
       } else {
         // set payload for real user
         req.customerTokenPayload = decoded;
+        console.log(decoded);
         next();
       }
     });
