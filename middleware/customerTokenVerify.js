@@ -26,8 +26,8 @@ module.exports = customerTokenVerify = async (req, res, next) => {
     // Get the secret from database
     const check = await prisma.userTokenSecret.findFirst({
       where: {
-        sid: tokenPayload.payload.sid,
-        user_id: tokenPayload.payload.customer.uuid,
+        sid: tokenPayload?.payload?.sid,
+        user_id: tokenPayload?.payload?.customer?.uuid,
       },
     });
     if (!check) {

@@ -25,15 +25,13 @@ const addMineCartItem = async (req, res) => {
     });
     return;
   }
-
-  if (req.body.cart_id) {
-    existCart = await prisma.cart.findUnique({
-      where: {
-        uuid: cart_id,
-      },
-    });
-  }
-
+  //
+  existCart = await prisma.cart.findUnique({
+    where: {
+      uuid: cart_id,
+    },
+  });
+  //
   if (!existCart) {
     // create a new cart
     // get customer payload
@@ -121,7 +119,7 @@ const removeMineCartItem = async (req, res) => {
       data: removedItem,
     });
   }
-  };
+};
 
 module.exports = {
   addMineCartItem,

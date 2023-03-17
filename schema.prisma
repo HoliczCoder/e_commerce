@@ -73,7 +73,7 @@ model CustomerGroup {
 
 model UserTokenSecret {
     user_token_secret_id Int      @id @default(autoincrement())
-    user_id              String
+    user_id              String   @unique
     sid                  String
     secret               String
     created_at           DateTime @default(now())
@@ -344,8 +344,8 @@ model CartItem {
     created_at             DateTime @default(now())
     updated_at             DateTime @default(now()) @updatedAt
 
-    @@map("cart_item")
     @@unique([cart_id, product_id])
+    @@map("cart_item")
 }
 
 model Order {
