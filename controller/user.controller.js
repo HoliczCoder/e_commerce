@@ -20,7 +20,7 @@ const createCustomer = async (req, res) => {
       },
     });
     res.json({
-      result: "okie",
+      message: "register successfully",
     });
   } catch (error) {
     res.status(500).json({
@@ -56,7 +56,7 @@ const createCustomerSession = async (req, res) => {
       const sid = uuidv4();
       const JWT_SECRET = uuidv4();
       // find user_token_secret
-      const userTokenSecret = await prisma.userTokenSecret.findUnique({
+      const userTokenSecret = await prisma.userTokenSecret.findFirst({
         where: {
           user_id: customer.uuid,
         },
@@ -90,7 +90,7 @@ const createCustomerSession = async (req, res) => {
         // const token = sign(newPayload, JWT_SECRET);
         const token = generateToken(newPayload, JWT_SECRET, "2d");
         // send token to cookie
-        res.cookie('token', token);
+        res.cookie("token", token);
         res.status(200).json({
           message: "login successfully",
         });
