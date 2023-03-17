@@ -26,7 +26,7 @@ const addMineCartItem = async (req, res) => {
     return;
   }
   //
-  existCart = await prisma.cart.findUnique({
+  existCart = await prisma.cart.findFirst({
     where: {
       uuid: cart_id,
     },

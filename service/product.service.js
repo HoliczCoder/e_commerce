@@ -159,7 +159,7 @@ const updateCategory = async (product, categories) => {
     });
   }
 
-  promises = [];
+  let promises = [];
 
   // Insert new categories
   for (let i = 0; i < categories.length; i += 1) {

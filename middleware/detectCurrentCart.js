@@ -36,10 +36,10 @@ module.exports = detectCurrentCart = async (req, res, next) => {
         req.cart_id = customerCart.uuid;
       }
       // send cart_id for using
-      req.cart_id = null;
+      req.cart_id = undefined;
     } else {
       // there is no current cart for real user
-      req.cart_id = null;
+      req.cart_id = undefined;
     }
   }
   next();
