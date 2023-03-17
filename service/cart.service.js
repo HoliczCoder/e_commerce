@@ -2,9 +2,7 @@ const { PrismaClient } = require("@prisma/client");
 const prisma = new PrismaClient();
 
 //product_id: product.product_id, qty
-const addItem = async (product, qty, cart) => {
-  console.log(cart);
-  console.log(product);
+const modifyItem = async (product, qty, cart, isAdding) => {
   // check if item exist in cart
   const ifExistCartItem = await prisma.cartItem.findUnique({
     where: {
@@ -43,10 +41,15 @@ const addItem = async (product, qty, cart) => {
         },
       },
       data: {
-        qty: ifExistCartItem.qty + qty, // adding quantity
+        qty: ifExistCartItem.qty + qty, // modify quantity
+        ...(isAdding == true
+          ? { qty: ifExistCartItem.qty + qty }
+          : { qty: ifExistCartItem.qty - qty }),
         final_price: product.price,
         final_price_incl_tax: product.price,
-        total: product.price * (ifExistCartItem.qty + qty),
+        ...(isAdding == true
+          ? { total: product.price * (ifExistCartItem.qty + qty) }
+          : { total: product.price * (ifExistCartItem.qty - qty) }),
       },
     });
   }
@@ -54,6 +57,31 @@ const addItem = async (product, qty, cart) => {
   return cartItem;
 };
 
+const removeItem = async (product, cart) => {
+  // find if cart item exist
+  let cartItem = "";
+  const ifExistCartItem = await prisma.cartItem.findUnique({
+    where: {
+      cart_id_product_id: {
+        cart_id: cart.cart_id,
+        product_id: product.product_id,
+      },
+    },
+  });
+  if (ifExistCartItem) {
+    cartItem = await prisma.cartItem.delete({
+      where: {
+        cart_id_product_id: {
+          cart_id: cart.cart_id,
+          product_id: product.product_id,
+        },
+      },
+    });
+  }
+  return cartItem;
+};
+
 module.exports = {
-  addItem,
+  modifyItem,
+  removeItem,
 };

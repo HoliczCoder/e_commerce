@@ -1,8 +1,14 @@
 var express = require("express");
 var router = express.Router();
-const { addMineCartItem } = require("../controller/cart.controller");
+const {
+  addMineCartItem,
+  removeMineCartItem,
+} = require("../controller/cart.controller");
 const customerTokenVerify = require("../middleware/customerTokenVerify");
+const detectCurrentCart = require("../middleware/detectCurrentCart");
 
-router.post("/add-item", customerTokenVerify, addMineCartItem);
+router.post("/add-item", customerTokenVerify, detectCurrentCart, addMineCartItem);
+
+router.delete("/delete-item", customerTokenVerify, removeMineCartItem);
 
 module.exports = router;
