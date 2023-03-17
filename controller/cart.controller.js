@@ -4,8 +4,8 @@ const { addItem } = require("../service/cart.service");
 
 const addMineCartItem = async (req, res) => {
   const { sku, qty } = req.body;
-  const item = "";
-  const existCart = "";
+  let item = "";
+  let existCart = "";
   if (req.body.cart_id) {
     existCart = await prisma.cart.findUnique({
       where: {

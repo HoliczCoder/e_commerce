@@ -12,7 +12,7 @@ const addItem = async (product, qty, cart) => {
       product_id: product.product_id,
     },
   });
-  const cartItem = "";
+  let cartItem = "";
   if (!ifExistCartItem) {
     // create cartItem   // debug to here
     cartItem = await prisma.cartItem.create({
