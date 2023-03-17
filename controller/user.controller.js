@@ -99,4 +99,27 @@ const createCustomerSession = async (req, res) => {
   }
 };
 
-module.exports = { createCustomer, createCustomerSession };
+const deleteCustomerSession = async (req, res) => {
+  const customerTokenPayload = req.customerTokenPayload;
+  const user_id = customerTokenPayload?.customer?.uuid;
+  if (user_id) {
+    await prisma.userTokenSecret.deleteMany({
+      where: {
+        user_id: user_id,
+      },
+    });
+    res.status(200).json({
+      message: "logout successfully",
+    });
+  } else {
+    res.status(200).json({
+      message: "you have already logged out",
+    });
+  }
+};
+
+module.exports = {
+  createCustomer,
+  createCustomerSession,
+  deleteCustomerSession,
+};
