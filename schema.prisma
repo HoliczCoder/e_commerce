@@ -345,6 +345,7 @@ model CartItem {
     updated_at             DateTime @default(now()) @updatedAt
 
     @@map("cart_item")
+    @@unique([cart_id, product_id])
 }
 
 model Order {
