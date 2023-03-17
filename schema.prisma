@@ -269,7 +269,7 @@ model CategoryDescription {
 model Cart {
     cart_id               Int        @id @default(autoincrement())
     uuid                  String     @unique @default(dbgenerated("(replace(uuid(),'-',''))"))
-    sid                   String?
+    sid                   String?    @unique
     currency              String     @default("USD")
     // guest user also have cart, so customer_id is no need
     customer_id           Int?

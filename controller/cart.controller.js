@@ -84,14 +84,13 @@ const addMineCartItem = async (req, res) => {
 
 const removeMineCartItem = async (req, res) => {
   const { sku } = req.body;
-  let existCart = "";
-  if (req.body.cart_id) {
-    existCart = await prisma.cart.findUnique({
-      where: {
-        cart_id: req.body.cart_id,
-      },
-    });
-  }
+  const cart_id = req.cart_id;
+  //
+  const existCart = await prisma.cart.findUnique({
+    where: {
+      uuid: cart_id,
+    },
+  });
   //
   if (!existCart) {
     res.status(404).json({
@@ -122,7 +121,7 @@ const removeMineCartItem = async (req, res) => {
       data: removedItem,
     });
   }
-};
+  };
 
 module.exports = {
   addMineCartItem,

@@ -9,6 +9,6 @@ const detectCurrentCart = require("../middleware/detectCurrentCart");
 
 router.post("/add-item", customerTokenVerify, detectCurrentCart, addMineCartItem);
 
-router.delete("/delete-item", customerTokenVerify, removeMineCartItem);
+router.delete("/delete-item", customerTokenVerify, detectCurrentCart, removeMineCartItem);
 
 module.exports = router;

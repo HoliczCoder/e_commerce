@@ -42,4 +42,5 @@ module.exports = detectCurrentCart = async (req, res, next) => {
       req.cart_id = null;
     }
   }
+  next();
 };
