@@ -4,7 +4,7 @@ const { generateToken } = require("../services/generateToken");
 const { PrismaClient } = require("@prisma/client");
 const prisma = new PrismaClient();
 
-module.exports = customerTokenVerify = async (req, res, next) => {
+const customerTokenVerify = async (req, res, next) => {
   // get the token
   const token = req.cookies.token;
   // Get the jwt token from the req
@@ -56,3 +56,5 @@ module.exports = customerTokenVerify = async (req, res, next) => {
     });
   }
 };
+
+module.exports = customerTokenVerify;

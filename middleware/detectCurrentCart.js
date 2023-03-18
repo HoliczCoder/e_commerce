@@ -1,7 +1,7 @@
 const { PrismaClient } = require("@prisma/client");
 const prisma = new PrismaClient();
 
-module.exports = detectCurrentCart = async (req, res, next) => {
+const detectCurrentCart = async (req, res, next) => {
   const customerTokenPayload = req.customerTokenPayload;
   const { sid } = customerTokenPayload;
   // Check if any cart is associated with the session id
@@ -44,3 +44,5 @@ module.exports = detectCurrentCart = async (req, res, next) => {
   }
   next();
 };
+
+module.exports = detectCurrentCart;

@@ -1,12 +1,10 @@
 const { PrismaClient } = require("@prisma/client");
 const prisma = new PrismaClient();
-const { modifyItem, removeItem } = require("../service/cart.service");
+const { modifyItem, removeItem, saveCart } = require("../service/cart.service");
 
 const addMineCartItem = async (req, res) => {
   const { sku, qty, isAdding } = req.body;
   const cart_id = req.cart_id;
-  let item = "";
-  let existCart = "";
 
   try {
     // get product by sku
@@ -27,14 +25,13 @@ const addMineCartItem = async (req, res) => {
       return;
     }
     //
-    existCart = await prisma.cart.findFirst({
+    const existCart = await prisma.cart.findFirst({
       where: {
         uuid: cart_id,
       },
     });
     //
-    if (!existCart) {
-      // create a new cart
+    if (!existCart?.cart_id) {
       // get customer payload
       const customerTokenPayload = req.customerTokenPayload;
       // customer is real customer or guest customer is still creating their cart
@@ -60,25 +57,29 @@ const addMineCartItem = async (req, res) => {
         },
       });
       // If everything is fine, add the product to the cart
-      item = await modifyItem(product, qty, newCart, isAdding);
-
+      const item = await modifyItem(product, qty, newCart.cart_id, isAdding);
+      // and save cart
+      const savedCart = await saveCart(newCart, item, qty, isAdding);
       // get token for guest user dont have cart
       const token = req.token ?? req.token;
       // send token to guest user if token exist
       if (token) {
         res.cookie("token", token);
       }
+      res.status(200).json({
+        data: { item, savedCart },
+      });
+      return;
     } else {
-      item = await modifyItem(product, qty, existCart, isAdding);
+      const item = await modifyItem(product, qty, existCart.cart_id, isAdding);
+      // and save cart
+      const savedCart = await saveCart(existCart, item, qty, isAdding);
+      res.status(200).json({
+        data: { item, savedCart },
+      });
+      return;
     }
-    // send token to client, user login dont need token
-    // res.cookies.token = token;
-
     //
-    res.status(200).json({
-      data: { item },
-    });
-    return;
   } catch (error) {
     res.status(500).json({
       error: error,
@@ -119,10 +120,18 @@ const removeMineCartItem = async (req, res) => {
         });
         return;
       }
-      //
-      const removedItem = await removeItem(product, existCart);
+      // then remove item
+      const removedItem = await removeItem(product, existCart.cart_id);
+      // the save cart
+      const savedCart = await saveCart(
+        existCart,
+        removedItem,
+        removedItem?.qty,
+        false
+      );
+
       res.status(200).json({
-        data: removedItem,
+        data: { removedItem, savedCart },
       });
     }
   } catch (error) {
