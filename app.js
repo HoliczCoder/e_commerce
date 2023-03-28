@@ -9,6 +9,8 @@ require("dotenv").config();
 const routes = require("./routes/routes.index.js");
 const { resolve } = require("path");
 const { readdirSync } = require("fs");
+const server = require("./graphql/schema.js")
+const expressMiddleware = require("@apollo/server/express4")
 
 var app = express();
 
@@ -34,12 +36,9 @@ console.log(
       return { name: dirent.name, path: resolve(paths, dirent.name) };
     })
 );
-//
-// app.get("/", (req, res) => {
-//   res.json({
-//     result: "hello world",
-//   });
-// });
+// graphql api
+app.use("/graphql", expressMiddleware(server));
+// rest api
 app.use("/api", routes);
 //
 
