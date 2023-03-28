@@ -3,44 +3,6 @@ const prisma = new PrismaClient();
 
 const resolvers = {
   Product: {
-    // categories: async (product) => {
-    //   try {
-    //     const productAttributeValueIndex =
-    //       await prisma.productAttributeValueIndex.findMany({
-    //         where: {
-    //           product_id: product.product_id,
-    //         },
-    //       });
-    //     // if exist
-    //     if (productAttributeValueIndex.length) {
-    //       const attributes = [];
-    //       const promises = [];
-    //       // find all attribute with attribute_id
-    //       productAttributeValueIndex.forEach((item) => {
-    //         promises.push(
-    //           prisma.atrribute.findUnique({
-    //             where: {
-    //               attribute_id: item.attribute_id,
-    //             },
-    //           })
-    //         );
-    //       });
-    //       //
-    //       await Promise.allSettled(promises).then((results) =>
-    //         results.forEach((result) => {
-    //           console.log(result.status);
-    //           attributes.push(result);
-    //         })
-    //       );
-    //       //
-    //       return attributes;
-    //     } else {
-    //       return null;
-    //     }
-    //   } catch (error) {
-    //     console.log(error);
-    //   }
-    // },
     categories: async (product) => {
       try {
         const productCateogory = await prisma.productCateogory.findMany({
@@ -58,7 +20,7 @@ const resolvers = {
               cd.name, c.include_in_nav, cd.description,
               cd.url_key, cd.meta_title, cd.meta_description, cd.meta_keywords
               FROM category as c INNER JOIN category_description as cd 
-              ON c.category_id = cd.category_description_id
+              ON c.category_id = cd.category_description_category_id
               WHERE c.category_id = ${item.category_id}`
             );
           });
@@ -82,14 +44,25 @@ const resolvers = {
   Query: {
     product: async (_, { product_id }) => {
       try {
-        return await prisma.product.findUnique({
-          where: {
-            product_id: product_id,
-          },
-          include: {
-            ProductDescription,
-          },
-        });
+        // return await prisma.product.findUnique({
+        //   where: {
+        //     product_id: product_id,
+        //   },
+        //   include: {
+        //     ProductDescription,
+        //   },
+        // });
+        const result = await prisma.$executeRaw`SELECT p.product_id, p.uuid,
+        pd.name, p.status, p.sku, p.weight,
+        p.tax_class, pd.description, pd.url_key,
+        pd.meta_title, pd.meta_description, pd.meta_keywords,
+        p.variant_group_id, p.visibility, p.group_id
+        FROM product as p 
+        LEFT JOIN product_description as pd 
+        ON p.product_id = pd.product_description_product_id
+        WHERE p.product_id = ${product_id} LIMIT 1;`;
+        //
+        return result;
       } catch (error) {
         // not a legit way to deal with error
         console.log(error);
