@@ -51,16 +51,26 @@ const resolvers = {
         if (productCateogory.length) {
           const categories = [];
           const promises = [];
+          // find all categories
           productCateogory.forEach((item) => {
             promises.push(
-              prisma.category.findUnique({
-                where: {
-                  category_id: item.category_id,
-                },
-                // damn, thinking switching to raw query
-              })
+              prisma.$queryRaw`SELECT c.category_id, c.uuid, c.status,
+              cd.name, c.include_in_nav, cd.description,
+              cd.url_key, cd.meta_title, cd.meta_description, cd.meta_keywords
+              FROM category as c INNER JOIN category_description as cd 
+              ON c.category_id = cd.category_description_id
+              WHERE c.category_id = ${item.category_id}`
             );
           });
+          // settle all
+          await Promise.allSettled(promises).then((results) =>
+            results.forEach((result) => {
+              console.log(result);
+              categories.push(result);
+            })
+          );
+          //
+          return categories;
         } else {
           return null;
         }

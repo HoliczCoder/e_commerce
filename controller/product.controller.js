@@ -43,7 +43,6 @@ const createProduct = async (req, res) => {
       }
     }
 
-
     // save Attribute
     const attributes = req.body.attributes;
     if (attributes) {
@@ -193,10 +192,24 @@ const getAllProduct = async (req, res) => {
   }
 };
 
+const getAllProductByRawQuery = async (req, res) => {
+  try {
+    const result = await prisma.$queryRaw`SELECT * FROM product`;
+    res.status(200).json({
+      data: result,
+    });
+  } catch (error) {
+    res.status(500).json({
+      error: error,
+    });
+  }
+};
+
 module.exports = {
   createProduct,
   updateProduct,
   deleteProduct,
   getProduct,
   getAllProduct,
+  getAllProductByRawQuery
 };

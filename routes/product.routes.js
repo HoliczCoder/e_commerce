@@ -7,9 +7,11 @@ const {
   deleteProduct,
   getProduct,
   getAllProduct,
+  getAllProductByRawQuery
 } = require("../controller/product.controller");
 
 router.get("/find-all", getAllProduct);
+router.get("/raw-query", getAllProductByRawQuery)
 router.get("/", getProduct);
 router.post("/", createProduct);
 router.put("/", updateProduct);
