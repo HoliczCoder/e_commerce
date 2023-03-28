@@ -1,0 +1,34 @@
+"""
+The `Category` type represents a category object.
+"""
+type Category {
+  # exist field
+  category_id: ID!
+  uuid: String!
+  # join CategoryDescription table, is prisma allowed to join?
+  name: String!
+  status: Int!
+  include_in_nav: Int!
+  description: String
+  url_key: String
+  meta_title: String
+  meta_description: String
+  meta_keywords: String
+  #   is this exist?
+  #   image: CategoryImage
+  products(filters: [FilterInput]): ProductCollection
+  #   custom field
+  url: String
+  editUrl: String
+  updateApi: String!
+  deleteApi: String!
+  availableAttributes: [FilterAttribute]
+  priceRange: PriceRange
+}
+
+type ProductCollection {
+  items: [Product]
+  currentPage: Int!
+  total: Int!
+  currentFilters: [Filter]
+}

@@ -7,6 +7,8 @@ var logger = require("morgan");
 var bodyParser = require("body-parser");
 require("dotenv").config();
 const routes = require("./routes/routes.index.js");
+const { resolve } = require("path");
+const { readdirSync } = require("fs");
 
 var app = express();
 
@@ -21,7 +23,17 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, "public")));
 app.use(cors());
 app.use(bodyParser.json());
-
+// testing
+const paths = resolve(__dirname, './migrations')
+console.log(
+  readdirSync(paths, { withFileTypes: true })
+    .filter((dirent) => {
+      return dirent.isDirectory();
+    })
+    .map((dirent) => {
+      return { name: dirent.name, path: resolve(paths, dirent.name) };
+    })
+);
 //
 // app.get("/", (req, res) => {
 //   res.json({
