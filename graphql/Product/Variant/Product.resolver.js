@@ -42,17 +42,9 @@ const resolvers = {
     },
   },
   Query: {
-    product: async (_, { product_id }) => {
+    product: async (_, { id }) => {
       try {
-        // return await prisma.product.findUnique({
-        //   where: {
-        //     product_id: product_id,
-        //   },
-        //   include: {
-        //     ProductDescription,
-        //   },
-        // });
-        const result = await prisma.$executeRaw`SELECT p.product_id, p.uuid,
+        const result = await prisma.$queryRaw`SELECT p.product_id, p.uuid,
         pd.name, p.status, p.sku, p.weight,
         p.tax_class, pd.description, pd.url_key,
         pd.meta_title, pd.meta_description, pd.meta_keywords,
@@ -60,9 +52,9 @@ const resolvers = {
         FROM product as p 
         LEFT JOIN product_description as pd 
         ON p.product_id = pd.product_description_product_id
-        WHERE p.product_id = ${product_id} LIMIT 1;`;
+        WHERE p.product_id = ${id} LIMIT 1`;
         //
-        return result;
+        return result[0];
       } catch (error) {
         // not a legit way to deal with error
         console.log(error);

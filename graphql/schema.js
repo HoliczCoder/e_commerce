@@ -1,5 +1,5 @@
-import { ApolloServer } from "@apollo/server";
-import ProductResolver from "./product/variant/Product.resolver";
+const { ApolloServer } = require("@apollo/server")
+const ProductResolver = require("./product/variant/Product.resolver")
 
 const resolvers = {
   ...ProductResolver,
@@ -13,7 +13,7 @@ const typeDefs = `#graphql
   name: String!
   status: Int!
   sku: String!
-  weight: Weight!
+  weight: Float!
   tax_class: Int
   description: String
   url_key: String
@@ -50,22 +50,22 @@ type Category {
   meta_keywords: String
   #   is this exist?
   #   image: CategoryImage
-  products(filters: [FilterInput]): ProductCollection
+  # products(filters: [FilterInput]): ProductCollection
   #   custom field
-  url: String
-  editUrl: String
-  updateApi: String!
-  deleteApi: String!
-  availableAttributes: [FilterAttribute]
-  priceRange: PriceRange
+  # url: String
+  # editUrl: String
+  # updateApi: String!
+  # deleteApi: String!
+  # availableAttributes: [FilterAttribute]
+  # priceRange: PriceRange
 }
 
-type ProductCollection {
-  items: [Product]
-  currentPage: Int!
-  total: Int!
-  currentFilters: [Filter]
-}
+# type ProductCollection {
+#   items: [Product]
+#   currentPage: Int!
+#   total: Int!
+#   currentFilters: [Filter]
+# }
 `;
 
 //
