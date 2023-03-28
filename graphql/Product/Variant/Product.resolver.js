@@ -27,8 +27,7 @@ const resolvers = {
           // settle all
           await Promise.allSettled(promises).then((results) =>
             results.forEach((result) => {
-              console.log(result);
-              categories.push(result);
+              categories.push(result.value[0]);
             })
           );
           //
