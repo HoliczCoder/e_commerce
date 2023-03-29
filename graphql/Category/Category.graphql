@@ -5,7 +5,7 @@ type Category {
   # exist field
   category_id: ID!
   uuid: String!
-  # join CategoryDescription table, is prisma allowed to join?
+  # join CategoryDescription table
   name: String!
   status: Int!
   include_in_nav: Int!
@@ -15,8 +15,8 @@ type Category {
   meta_description: String
   meta_keywords: String
   #   is this exist?
-  #   image: CategoryImage
-  # products(filters: [FilterInput]): ProductCollection
+  image: CategoryImage
+  products(filters: [FilterInput]): ProductCollection
   #   custom field
   url: String
   editUrl: String
@@ -30,5 +30,80 @@ type ProductCollection {
   items: [Product]
   currentPage: Int!
   total: Int!
-  # currentFilters: [Filter]
+  currentFilters: [Filter]
+}
+
+# """
+# The `CategoryImage` type represents a category image object.
+# """
+type CategoryImage {
+  path: String!
+  url: String!
+}
+
+# """
+# The `FilterInput` type represents a filter input object.
+# """
+input FilterInput {
+  key: String!
+  operation: String!
+  value: String!
+}
+
+# """
+# The `Filter` type represents a filter object.
+# """
+type Filter {
+  key: String!
+  operation: String!
+  value: String!
+}
+
+# """
+# The `FilterOption` type represents a filter option object.
+# """
+type FilterOption {
+  optionId: Int!
+  optionText: String!
+}
+
+# """
+# The `FilterAttribute` type represents a filter attribute object.
+# """
+type FilterAttribute {
+  attributeName: String!
+  attributeCode: String!
+  attributeId: Int!
+  options: [FilterOption]
+}
+
+# """
+# Returns a collection of categories.
+# """
+type CategoryCollection {
+  items: [Category]
+  currentPage: Int!
+  total: Int!
+  currentFilters: [Filter]
+}
+
+# """
+# Returns a collection of products.
+# """
+type ProductCollection {
+  items: [Product]
+  currentPage: Int!
+  total: Int!
+  currentFilters: [Filter]
+}
+
+type PriceRange {
+  min: Float!
+  max: Float!
+}
+
+extend type Query {
+  #   categories(filters: [FilterInput]): CategoryCollection
+  category(id: Int): Category
+  products(filters: [FilterInput]): ProductCollection
 }

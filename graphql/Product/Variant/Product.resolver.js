@@ -16,6 +16,7 @@ const resolvers = {
           // find all categories
           productCateogory.forEach((item) => {
             promises.push(
+              // safe query
               prisma.$queryRaw`SELECT c.category_id, c.uuid, c.status,
               cd.name, c.include_in_nav, cd.description,
               cd.url_key, cd.meta_title, cd.meta_description, cd.meta_keywords
@@ -43,6 +44,7 @@ const resolvers = {
   Query: {
     product: async (_, { id }) => {
       try {
+        // safe query
         const result = await prisma.$queryRaw`SELECT p.product_id, p.uuid,
         pd.name, p.status, p.sku, p.weight,
         p.tax_class, pd.description, pd.url_key,
