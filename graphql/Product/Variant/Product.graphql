@@ -7,7 +7,7 @@ type Product {
   name: String!
   status: Int!
   sku: String!
-  weight: Weight!
+  weight: Float!
   tax_class: Int
   description: String
   url_key: String
@@ -23,6 +23,11 @@ type Product {
   editUrl: String
   updateApi: String!
   deleteApi: String!
+}
+
+#   root Quert
+type Query {
+  hello: String
 }
 
 extend type Query {
