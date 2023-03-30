@@ -57,7 +57,11 @@ const resolver = {
         let currentQtyFilter;
         if (Number.isNaN(min) === false && Number.isNaN(max) === false) {
           //
-          queryQty = Prisma.sql` AND p.qty BETWEEN ${min} AND ${max} `;
+          if (priceFilter) {
+            queryQty = Prisma.sql` AND p.qty BETWEEN ${min} AND ${max} `;
+          } else {
+            queryQty = Prisma.sql` WHERE p.qty BETWEEN ${min} AND ${max} `;
+          }
           //
           currentQtyFilter = {
             key: "qty",
@@ -73,8 +77,13 @@ const resolver = {
       // Name filter
       const nameFilter = filters.find((f) => f.key === "name");
       if (nameFilter) {
-        const stringValue = `%${nameFilter.value}%`
-        queryName = Prisma.sql` AND pd.name LIKE ${stringValue} `;
+        const stringValue = `%${nameFilter.value}%`;
+        //
+        if (priceFilter || qtyFilter) {
+          queryName = Prisma.sql` AND pd.name LIKE ${stringValue} `;
+        } else {
+          queryName = Prisma.sql` WHERE pd.name LIKE ${stringValue} `;
+        }
         //
         currentFilters.push({
           key: "name",
@@ -85,8 +94,14 @@ const resolver = {
       // Sku filter
       const skuFilter = filters.find((f) => f.key === "sku");
       if (skuFilter) {
-        const stringValue = `%${skuFilter.value}%`
-        querySku = Prisma.sql` AND p.sku LIKE ${stringValue} `;
+        const stringValue = `%${skuFilter.value}%`;
+        //
+        if (priceFilter || qtyFilter || nameFilter) {
+          querySku = Prisma.sql` AND p.sku LIKE ${stringValue} `;
+        } else {
+          querySku = Prisma.sql` WHERE p.sku LIKE ${stringValue} `;
+        }
+
         //SQl injection risk
         currentFilters.push({
           key: "sku",
