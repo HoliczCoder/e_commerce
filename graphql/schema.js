@@ -11,34 +11,27 @@ const typeDefs = mergeTypeDefs(
   typeSources.map((source) => loadFilesSync(source))
 );
 
+const loopResolver = [ProductResolver, CategoryResolver];
 const typeResolver = {};
 
-Object.keys(ProductResolver).map((key) => {
-  if (key !== "Query") {
-    // adding
-    typeResolver[key] = ProductResolver[key];
-  }
+loopResolver.forEach((itemResolver) => {
+  Object.keys(itemResolver).map((key) => {
+    if (key !== "Query") {
+      // adding
+      typeResolver[key] = itemResolver[key];
+    }
+  });
 });
-
-Object.keys(CategoryResolver).map((key) => {
-  if (key !== "Query") {
-    // adding
-    typeResolver[key] = CategoryResolver[key];
-  }
-});
-
-console.log("typeResolver",typeResolver);
-
-const P = ProductResolver.Query;
-const C = CategoryResolver.Query;
 
 const resolvers = {
   ...typeResolver,
   Query: {
-    ...P,
-    ...C,
+    ...(ProductResolver.Query),
+    ...(CategoryResolver.Query),
   },
 };
+
+console.log(resolvers);
 
 //
 const server = new ApolloServer({
