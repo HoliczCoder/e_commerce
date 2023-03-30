@@ -6,9 +6,108 @@ const prisma = new PrismaClient({
 const resolver = {
   Query: {
     // pending
-    // categories: async () => {
+    categories: async (_, { filters = [] }) => {
+      const currentFilters = [];
+      let queryIncludeInNav;
+      let queryName;
+      let queryStatus;
+      let queryOrder;
 
-    // },
+      // Name filter
+      const nameFilter = filters.find((f) => f.key === "name");
+      //
+      if (nameFilter) {
+        const stringValue = `%${nameFilter.value}%`;
+        //
+        queryName = Prisma.sql` WHERE cd.name LIKE ${stringValue} `;
+        //
+        currentFilters.push({
+          key: "name",
+          operation: "=",
+          value: nameFilter.value,
+        });
+      }
+      // Status filter
+      const statusFilter = filters.find((f) => f.key === "status");
+      if (statusFilter) {
+        if (nameFilter) {
+          queryStatus = Prisma.sql` AND c.status = ${nameFilter.value} `;
+        } else {
+          queryStatus = Prisma.sql` WHERE c.status = ${nameFilter.value} `;
+        }
+        //
+        currentFilters.push({
+          key: "status",
+          operation: "=",
+          value: statusFilter.value,
+        });
+      }
+      // includeInNav filter
+      const includeInNav = filters.find((f) => f.key === "includeInNav");
+      if (includeInNav) {
+        if (nameFilter || statusFilter) {
+          queryIncludeInNav = Prisma.sql` AND c.include_in_nav = ${includeInNav.value} `;
+        } else {
+          queryIncludeInNav = Prisma.sql` WHERE c.include_in_nav = ${includeInNav.value} `;
+        }
+        //
+        currentFilters.push({
+          key: "includeInNav",
+          operation: "=",
+          value: includeInNav.value,
+        });
+      }
+      // order filter
+      const sortBy = filters.find((f) => f.key === "sortBy");
+      const sortOrder = filters.find(
+        (f) => f.key === "sortOrder" && ["ASC", "DESC"].includes(f.value)
+      ) || { value: "ASC" };
+      if (sortBy && sortOrder) {
+        queryOrder = Prisma.sql` ORDER BY ${sortBy.value} ${sortOrder.value}`;
+        //
+        currentFilters.push({
+          key: "sortOrder",
+          operation: "=",
+          value: sortOrder.value,
+        });
+      }
+      // Total
+      const total = await prisma.category.count();
+      // Paging
+      const page = filters.find((f) => f.key === "page") || { value: 1 };
+      const limit = filters.find((f) => f.key === "limit") || { value: 20 };
+      //
+      currentFilters.push({
+        key: "page",
+        operation: "=",
+        value: page.value,
+      });
+      currentFilters.push({
+        key: "limit",
+        operation: "=",
+        value: limit.value,
+      });
+      // Finally query it
+      const result =
+        await prisma.$queryRaw`SELECT c.category_id, c.uuid, c.status,
+      cd.name, c.include_in_nav, cd.description,
+      cd.url_key, cd.meta_title, cd.meta_description, cd.meta_keywords
+      FROM category as c INNER JOIN category_description as cd 
+      ON c.category_id = cd.category_description_category_id
+      ${queryName ? queryName : Prisma.empty}
+      ${queryStatus ? queryStatus : Prisma.empty}
+      ${queryIncludeInNav ? queryIncludeInNav : Prisma.empty}
+      ${queryOrder ? queryOrder : Prisma.empty}
+      LIMIT ${limit.value} OFFSET ${(page.value - 1) * limit.value}
+      `;
+      //
+      return {
+        items: result,
+        currentPage: page.value,
+        total: total,
+        currentFilters: currentFilters,
+      };
+    },
     category: async (_, { id }) => {
       // safe query
       const result =
@@ -29,7 +128,7 @@ const resolver = {
 
       // Price filter
       const priceFilter = filters.find((f) => f.key === "price");
-      //SQl injection risk free
+      //
       if (priceFilter) {
         const [min, max] = priceFilter.value
           .split("-")
@@ -147,8 +246,11 @@ const resolver = {
         total: total,
         currentFilters: currentFilters,
       };
-
-      // Damn, I do want the library :((((
+    },
+  },
+  Category: {
+    products: async (category, { filters = [] }) => {
+      // pending, damn, so much thing to write
     },
   },
 };
