@@ -25,6 +25,7 @@ const resolver = {
       let queryPrice;
       let queryQty;
       let queryName;
+      let querySku;
 
       // Price filter
       const priceFilter = filters.find((f) => f.key === "price");
@@ -73,7 +74,7 @@ const resolver = {
       const nameFilter = filters.find((f) => f.key === "name");
       if (nameFilter) {
         //
-        queryName = Prisma.sql` AND pd.name LIKE %${nameFilter.value}% `;
+        queryName = Prisma.sql` AND pd.name LIKE '%${nameFilter.value}%' `;
         //
         currentFilters.push({
           key: "name",
@@ -84,7 +85,7 @@ const resolver = {
       // Sku filter
       const skuFilter = filters.find((f) => f.key === "sku");
       if (skuFilter) {
-        query = query.concat(`AND pd.name LIKE %${skuFilter.value}% `);
+        querySku = Prisma.sql` AND p.sku LIKE '%${skuFilter.value}%' `;
         //SQl injection risk
         currentFilters.push({
           key: "sku",
@@ -120,6 +121,7 @@ const resolver = {
       ${queryPrice ? queryPrice : Prisma.empty}
       ${queryQty ? queryQty : Prisma.empty}
       ${queryName ? queryName : Prisma.empty}
+      ${querySku ? querySku : Prisma.empty}
       LIMIT ${limit.value} OFFSET ${(page.value - 1) * limit.value}
       `;
       //
